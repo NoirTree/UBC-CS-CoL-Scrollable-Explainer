@@ -106,6 +106,19 @@ var scrollVis = function () {
   var scatterShape = d3.scaleOrdinal(d3.symbols);
   var scatterSymbol = d3.symbol();
 
+  /**
+   * Safeball
+   */
+  var unsafeNum = 78,
+    safeNum = 10,
+    adjustR = 50;
+  var safeBallPos = {
+    unsafecx: width / 2,
+    unsafecy: height / 2,
+    safecx: width / 2 + unsafeNum + safeNum + adjustR * 2,
+    safecy: height / 2
+  };
+
   // When scrolling to a new section
   // the activation function for that
   // section is called.
@@ -184,6 +197,7 @@ var scrollVis = function () {
       setupScatterVis();
       setupBarVis(); // can add more data as multiple parameters. See the original design
       // console.log(dataDict);
+      setupSafeBalls();
       setupSections();
     });
   };
@@ -204,6 +218,15 @@ var scrollVis = function () {
       .style("font-size", 40);
 
     g.selectAll(".title").attr("opacity", 0);
+
+    // scroll down prompt
+    g.append("polygon")
+      .attr("class", "title prompt")
+      .attr("points", "0 0, 30 45, 60 0")
+      .attr("stroke", "grey")
+      .attr("fill", "grey")
+      .attr("transform", `translate(50, ${height - 50})`)
+      .attr("opacity", 0);
   }
 
   /**
@@ -408,7 +431,11 @@ var scrollVis = function () {
         return yBarScale(d.University);
       })
       .attr("width", 0) // first set to 0
-      .attr("fill", barColors["col"])
+      .attr("fill", function (d) {
+        return d.University === "University of British Columbia"
+          ? "#ddcc00"
+          : barColors["col"];
+      })
       .attr("height", yBarScale.bandwidth())
       .attr("opacity", barOpacity);
 
@@ -658,6 +685,61 @@ var scrollVis = function () {
   };
 
   /**
+   * setupSafeBalls - creates initial elements for SafeBalls
+   * sections of the visualization.
+   *
+   */
+  var setupSafeBalls = function () {
+    g.append("g")
+      .attr("class", "safeBalls")
+      .append("circle")
+      .attr("class", "unsafeBall")
+      .attr("cx", safeBallPos.unsafecx)
+      .attr("cy", safeBallPos.unsafecy)
+      .attr("r", 0)
+      .attr("fill", "red")
+      .attr("opacity", 0.7);
+
+    g.selectAll(".safeBalls")
+      .append("circle")
+      .attr("class", "safeBall")
+      .attr("cx", safeBallPos.safecx)
+      .attr("cy", safeBallPos.safecy)
+      .attr("r", 0)
+      .attr("fill", "steelblue")
+      .attr("opacity", 0.7);
+
+    // captions
+    g.selectAll(".safeBalls")
+      .append("g")
+      .attr("class", "safeBalls captions")
+      .append("text")
+      .attr("x", safeBallPos.unsafecx)
+      .attr("y", safeBallPos.unsafecy)
+      .attr("fill", "white")
+      .style("font-size", 40)
+      .attr("text-anchor", "middle")
+      .text(`${((unsafeNum * 100) / (unsafeNum + safeNum)).toFixed(1)}%`);
+    g.selectAll(".safeBalls.captions")
+      .append("text")
+      .attr("x", safeBallPos.unsafecx)
+      .attr("y", safeBallPos.unsafecy + 25)
+      .attr("fill", "white")
+      .style("font-size", 15)
+      .attr("text-anchor", "middle")
+      .text("feel unsafe");
+    g.selectAll(".safeBalls.captions")
+      .append("text")
+      .attr("x", safeBallPos.unsafecx)
+      .attr("y", safeBallPos.unsafecy + 25 + 20)
+      .attr("fill", "white")
+      .style("font-size", 15)
+      .attr("text-anchor", "middle")
+      .text("in current stipend amount");
+
+    g.selectAll(".safeBalls.captions").attr("opacity", 0);
+  };
+  /**
    * setupSections - each section is activated
    * by a separate function. Here we associate
    * these functions to the sections based on
@@ -675,10 +757,11 @@ var scrollVis = function () {
     activateFunctions[5] = showScatter;
     activateFunctions[6] = highLightScatter;
     activateFunctions[7] = afterSupportScatter;
-    activateFunctions[8] = showLollipop;
+    activateFunctions[8] = showSafeBalls;
     activateFunctions[9] = showBar;
     activateFunctions[10] = showReverseBar;
     activateFunctions[11] = reOrderBar;
+    activateFunctions[12] = closingTitle;
 
     // updateFunctions are called while
     // in a particular section to update
@@ -732,6 +815,31 @@ var scrollVis = function () {
       .transition()
       .duration(fadeOutDuration)
       .attr("opacity", 1);
+
+    var prompt = g.selectAll(".title.prompt");
+    prompt
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 1)
+      .on("end", propmtMovement);
+    // prompt
+    //   .transition()
+    //   .duration(fadeOutDuration)
+    //   .attr("transform", `translate(50, ${height - 50 + 30})`)
+    //   .transition()
+    //   .duration(fadeOutDuration)
+    //   .attr("transform", `translate(50, ${height - 50})`);
+    function propmtMovement() {
+      // console.log("propmtMovement is called");
+      prompt
+        .transition()
+        .duration(fadeOutDuration)
+        .attr("transform", `translate(50, ${height - 50 + 30})`)
+        .transition()
+        .duration(fadeOutDuration)
+        .attr("transform", `translate(50, ${height - 50})`)
+        .on("end", propmtMovement);
+    }
   }
 
   /**
@@ -1118,6 +1226,12 @@ var scrollVis = function () {
     g.selectAll(".originalDot")
       .transition()
       .duration(fadeOutDuration)
+      .attr("transform", function (d) {
+        return `translate(${xScatterScale(
+          d.basic_expenses
+        )},${yScatterScale(d.basic_income)})`;
+      })
+      .style("stroke", "black")
       .style("fill", "grey")
       .attr("opacity", scatterOpacity);
     g.selectAll("#xyauxiliary")
@@ -1154,10 +1268,18 @@ var scrollVis = function () {
     g.selectAll(".originalDot")
       .transition()
       .duration(fadeOutDuration)
+      .attr("transform", function (d) {
+        return `translate(${xScatterScale(
+          d.basic_expenses
+        )},${yScatterScale(d.basic_income)})`;
+      })
       .style("stroke", "black")
       .style("fill", "grey");
 
-    g.selectAll(".colorLegend").transition().attr("opacity", 0);
+    g.selectAll(".colorLegend")
+      .transition("hideColorLegend")
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
 
     // show now
     g.selectAll(".scatterCaption")
@@ -1175,12 +1297,6 @@ var scrollVis = function () {
 
   function afterSupportScatter() {
     // hide previous
-    // red dots go back
-    g.selectAll(".originalDot")
-      .transition()
-      .duration(fadeOutDuration)
-      .style("fill", "grey")
-      .attr("opacity", scatterOpacity);
     // hide captions
     g.selectAll(".scatterCaption")
       .transition()
@@ -1188,6 +1304,19 @@ var scrollVis = function () {
       .attr("opacity", 0);
 
     // hide next
+    g.selectAll(".safeBalls.captions")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
+    g.selectAll(".unsafeBall")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("r", 0);
+    g.selectAll(".safeBall")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("r", 0);
+    // redraw some parts that may be erased out
     showAxis(xAxisScatter, "bottomAxis", yAxisScatter, "leftAxis");
     g.selectAll("#xyauxiliary")
       .transition()
@@ -1203,8 +1332,23 @@ var scrollVis = function () {
       .attr("opacity", 1);
 
     // show new
+    g.selectAll(".originalDot")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("transform", function (d) {
+        return `translate(${xScatterScale(
+          d.basic_expenses
+        )},${yScatterScale(d.basic_income)})`;
+      })
+      .style("stroke", function (d) {
+        return scatterColors(d.financial_status);
+      })
+      .style("fill", "none")
+      .attr("opacity", scatterOpacity);
+
     g.selectAll(".connectLine")
       .transition()
+      .delay(200)
       .duration(fadeOutDuration)
       .attr("y1", function (d) {
         return yScatterScale(d.supported_income);
@@ -1212,57 +1356,65 @@ var scrollVis = function () {
 
     g.selectAll(".afterDot")
       .transition()
-      .delay(fadeOutDuration)
+      .delay(200 + 200)
       .duration(fadeOutDuration)
+      .attr("transform", function (d) {
+        return `translate(${xScatterScale(
+          d.basic_expenses
+        )},${yScatterScale(d.supported_income)})`;
+      })
       .attr("opacity", scatterOpacity);
 
-    g.selectAll(".originalDot")
+    g.selectAll(".colorLegend")
       .transition()
-      .delay(fadeOutDuration)
       .duration(fadeOutDuration)
-      .style("stroke", function (d) {
-        return scatterColors(d.financial_status);
-      })
-      .style("fill", "none");
-
-    g.selectAll(".colorLegend").transition().attr("opacity", 1);
+      .attr("opacity", 1);
   }
 
   /**
-   * showLollipop - Lollipop
+   * showSafeBalls - safeBall
    *
    * hides previous: scatterplot
    * hides next: barchart
-   * shows now: Lollipop
+   * shows now: safeBall
    *
    */
-  function showLollipop() {
+  function showSafeBalls() {
+    // will moveto setup later
+
     // hide previous
     hideAxis("bottomAxis", "leftAxis");
     g.selectAll(".connectLine")
       .transition()
-      .duration(fadeOutDuration)
+      .duration(100)
       .attr("y1", function (d) {
         return yScatterScale(d.basic_income);
       });
     g.selectAll(".afterDot")
       .transition()
       .duration(fadeOutDuration)
+      .attr("transform", function (d, i) {
+        return `translate(${safeBallPos.unsafecx},${safeBallPos.unsafecy})`;
+      })
+      .transition()
+      .duration(0)
       .attr("opacity", 0);
     g.selectAll(".originalDot")
       .transition()
       .duration(fadeOutDuration)
-      .attr("opacity", 0);
-    g.selectAll("#xyauxiliary")
+      .attr("transform", function (d, i) {
+        return `translate(${safeBallPos.safecx},${safeBallPos.safecy})`;
+      })
       .transition()
-      .duration(fadeOutDuration)
+      .duration(0)
       .attr("opacity", 0);
+    g.selectAll("#xyauxiliary").transition().duration(100).attr("opacity", 0);
     g.selectAll(".shapeLegendScatter")
       .transition()
       .duration(fadeOutDuration)
       .attr("opacity", 0);
     g.selectAll(".colorLegend")
-      .transition()
+      .transition("hideColorLegend")
       .duration(fadeOutDuration)
       .attr("opacity", 0);
     g.selectAll(".scatterAxisLabel")
@@ -1284,6 +1436,22 @@ var scrollVis = function () {
       .transition()
       .duration(fadeOutDuration)
       .attr("opacity", 0);
+
+    // show new
+    g.selectAll(".unsafeBall")
+      .transition()
+      .delay(200)
+      .duration(fadeOutDuration)
+      .attr("r", unsafeNum + adjustR);
+    g.selectAll(".safeBall")
+      .transition()
+      .delay(200)
+      .duration(fadeOutDuration)
+      .attr("r", safeNum + adjustR);
+    g.selectAll(".safeBalls.captions")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 1);
   }
 
   /**
@@ -1296,10 +1464,21 @@ var scrollVis = function () {
    */
   function showBar() {
     // ensure bar axis is set
-    hideAxis("bottomAxis");
     showAxis(xAxisBar, "topAxis", null, null);
 
     // hides previous:
+    g.selectAll(".safeBalls.captions")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
+    g.selectAll(".unsafeBall")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("r", 0);
+    g.selectAll(".safeBall")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("r", 0);
     // g.selectAll(".square").transition().duration(800).attr("opacity", 0);
 
     // hides next:
@@ -1344,6 +1523,9 @@ var scrollVis = function () {
     g.selectAll(".fundingBar")
       .transition("revertOrder")
       .duration(fadeOutDuration)
+      .attr("width", function (d) {
+        return xBarScale(d.Yearly_funding_kCAD);
+      })
       .attr("y", function (d) {
         return yBarScale(d.University);
       });
@@ -1388,6 +1570,9 @@ var scrollVis = function () {
    *
    */
   function reOrderBar() {
+    // hide next -- redraw
+
+    // draw new
     dataDict["phdFundingSorted"] = dataDict["phdFunding"]
       .concat()
       .sort(function (a, b) {
@@ -1403,20 +1588,31 @@ var scrollVis = function () {
         return d.University;
       })
     );
+    showAxis(xAxisBar, "topAxis", null, null); // need to redraw because it may come back from following sections
+
     // showAxis(null, null, yAxisBar, "leftAxis");
     g.selectAll(".fundingBar")
       .transition("reorder")
       .duration(fadeOutDuration)
+      .attr("width", function (d) {
+        return xBarScale(d.Yearly_funding_kCAD);
+      })
       .attr("y", function (d) {
         return yBarScale(d.University);
       });
     g.selectAll(".colBar")
       .transition("reorder")
       .duration(fadeOutDuration)
+      .attr("width", function (d) {
+        return xBarScale(d.Yearly_col_kCAD);
+      })
       .attr("y", function (d) {
         return yBarScale(d.University);
       });
     g.selectAll(".barText")
+      .transition("show")
+      .duration(0)
+      .attr("opacity", 1)
       .transition("reorder")
       .duration(fadeOutDuration)
       .attr("y", function (d) {
@@ -1424,17 +1620,28 @@ var scrollVis = function () {
       });
   }
   /**
-   * hideBars - barchart
+   * closingTitle
    *
    * hides previous: barchart
    * hides next:
    * shows now:
    *
    */
-  function hideBars() {
+  function closingTitle() {
     // hide previous
-    g.selectAll(".fundingBar").transition().duration(600).attr("width", 0);
-    g.selectAll(".colBar").transition().duration(600).attr("width", 0);
+    hideAxis("topAxis");
+    g.selectAll(".fundingBar")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("width", 0);
+    g.selectAll(".colBar")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("width", 0);
+    g.selectAll(".barText")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
   }
 
   /**
