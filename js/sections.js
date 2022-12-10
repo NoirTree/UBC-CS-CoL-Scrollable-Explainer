@@ -784,7 +784,7 @@ var scrollVis = function () {
     for (var i = 0; i < SectionNumbers; i++) {
       updateFunctions[i] = function () {};
     }
-    // updateFunctions[7] = updateCough;
+    updateFunctions[9] = updateSafeBalls;
   };
 
   /**
@@ -1171,73 +1171,6 @@ var scrollVis = function () {
   }
 
   /**
-   * subCPIHighlightHide - linechart
-   *
-   * helper function.
-   */
-  function subCPIHighlightHide(subCPI, subName) {
-    g.selectAll(`.multiCPILine.${subCPI}`)
-      .transition()
-      .duration(fadeOutDuration - 100)
-      .attr("opacity", 0.2);
-    g.selectAll(`.multiCPILineLabels.${subCPI}`)
-      .transition()
-      .duration(fadeOutDuration - 100)
-      .attr("opacity", 0.2);
-    g.selectAll(`.HLine.${subName}`)
-      .transition()
-      .duration(fadeOutDuration)
-      .attr("x2", width);
-    g.selectAll(`.HLineLabel.${subName}`)
-      .transition()
-      .duration(fadeOutDuration)
-      .attr("opacity", 0);
-  }
-
-  /**
-   * subCPIHighlight - linechart
-   *
-   * helper function.
-   */
-  function subCPIHighlight(subCPI, subName, lastCPI) {
-    g.selectAll(`.multiCPILine.${subCPI}`)
-      .transition()
-      .duration(fadeOutDuration - 100)
-      // .style("stroke-width", 2 + 10)
-      .attr("opacity", lineOpacity);
-    g.selectAll(`.multiCPILineLabels.${subCPI}`)
-      .transition()
-      .duration(0)
-      // .style("font-size", fontSize + 20)
-      .attr("opacity", 1);
-
-    // auxiliary line for highlighter
-    g.append("g")
-      .attr("class", `${subName} LineAuxi`)
-      .append("line")
-      .attr("class", `${subName} HLine`)
-      .attr("x1", width)
-      .attr("x2", width)
-      .attr("y1", yLineCPIScale(lastCPI))
-      .attr("y2", yLineCPIScale(lastCPI))
-      .attr("stroke", "grey")
-      .attr("opacity", 0.8)
-      .attr("stroke-dasharray", "3,2")
-      .transition()
-      .duration(fadeOutDuration)
-      .attr("x2", 0);
-
-    g.select(`.${subName}.LineAuxi`)
-      .append("text")
-      .attr("class", `${subName} HLineLabel`)
-      .attr("x", 10)
-      .attr("y", yLineCPIScale(lastCPI) - 5)
-      .transition()
-      .duration(fadeOutDuration)
-      .text(`${subName}: ${(lastCPI * 100).toFixed(2)}%`)
-      .style("font-size", fontSize);
-  }
-  /**
    * showScatter - scatterplot
    *
    * hides previous: lineChart (axis, lines, highlighter)
@@ -1507,20 +1440,20 @@ var scrollVis = function () {
       .attr("opacity", 0);
 
     // show new
-    g.selectAll(".unsafeBall")
-      .transition()
-      .delay(200)
-      .duration(fadeOutDuration)
-      .attr("r", unsafeNum + adjustR);
-    g.selectAll(".safeBall")
-      .transition()
-      .delay(200)
-      .duration(fadeOutDuration)
-      .attr("r", safeNum + adjustR);
-    g.selectAll(".safeBalls.captions")
-      .transition()
-      .duration(fadeOutDuration)
-      .attr("opacity", 1);
+    // g.selectAll(".unsafeBall")
+    //   .transition()
+    //   .delay(200)
+    //   .duration(fadeOutDuration)
+    //   .attr("r", unsafeNum + adjustR);
+    // g.selectAll(".safeBall")
+    //   .transition()
+    //   .delay(200)
+    //   .duration(fadeOutDuration)
+    //   .attr("r", safeNum + adjustR);
+    // g.selectAll(".safeBalls.captions")
+    //   .transition()
+    //   .duration(fadeOutDuration)
+    //   .attr("opacity", 1);
   }
 
   /**
@@ -1769,6 +1702,74 @@ var scrollVis = function () {
   }
 
   /**
+   * subCPIHighlightHide - linechart
+   *
+   * helper function.
+   */
+  function subCPIHighlightHide(subCPI, subName) {
+    g.selectAll(`.multiCPILine.${subCPI}`)
+      .transition()
+      .duration(fadeOutDuration - 100)
+      .attr("opacity", 0.2);
+    g.selectAll(`.multiCPILineLabels.${subCPI}`)
+      .transition()
+      .duration(fadeOutDuration - 100)
+      .attr("opacity", 0.2);
+    g.selectAll(`.HLine.${subName}`)
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("x2", width);
+    g.selectAll(`.HLineLabel.${subName}`)
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
+  }
+
+  /**
+   * subCPIHighlight - linechart
+   *
+   * helper function.
+   */
+  function subCPIHighlight(subCPI, subName, lastCPI) {
+    g.selectAll(`.multiCPILine.${subCPI}`)
+      .transition()
+      .duration(fadeOutDuration - 100)
+      // .style("stroke-width", 2 + 10)
+      .attr("opacity", lineOpacity);
+    g.selectAll(`.multiCPILineLabels.${subCPI}`)
+      .transition()
+      .duration(0)
+      // .style("font-size", fontSize + 20)
+      .attr("opacity", 1);
+
+    // auxiliary line for highlighter
+    g.append("g")
+      .attr("class", `${subName} LineAuxi`)
+      .append("line")
+      .attr("class", `${subName} HLine`)
+      .attr("x1", width)
+      .attr("x2", width)
+      .attr("y1", yLineCPIScale(lastCPI))
+      .attr("y2", yLineCPIScale(lastCPI))
+      .attr("stroke", "grey")
+      .attr("opacity", 0.8)
+      .attr("stroke-dasharray", "3,2")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("x2", 0);
+
+    g.select(`.${subName}.LineAuxi`)
+      .append("text")
+      .attr("class", `${subName} HLineLabel`)
+      .attr("x", 10)
+      .attr("y", yLineCPIScale(lastCPI) - 5)
+      .transition()
+      .duration(fadeOutDuration)
+      .text(`${subName}: ${(lastCPI * 100).toFixed(2)}%`)
+      .style("font-size", fontSize);
+  }
+
+  /**
    * UPDATE FUNCTIONS
    *
    * These will be called within a section
@@ -1780,7 +1781,28 @@ var scrollVis = function () {
    *
    */
 
-  // nothing here yet
+  /**
+   * updateSafeBalls - safeBall
+   *
+   * update size of ball based on how much has been scrolled.
+   *
+   */
+  function updateSafeBalls(progress) {
+    g.selectAll(".unsafeBall")
+      .transition()
+      // .delay(200)
+      .duration(fadeOutDuration)
+      .attr("r", (unsafeNum + adjustR) * Math.min(1, 2 * progress));
+    g.selectAll(".safeBall")
+      .transition()
+      // .delay(200)
+      .duration(fadeOutDuration)
+      .attr("r", (safeNum + adjustR) * Math.min(1, 2 * progress));
+    g.selectAll(".safeBalls.captions")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", Math.min(1, 2 * progress));
+  }
 
   /**
    * DATA FUNCTIONS
