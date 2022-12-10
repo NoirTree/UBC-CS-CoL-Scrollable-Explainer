@@ -384,6 +384,17 @@ var scrollVis = function () {
       })
     );
 
+    g.append("text")
+      .attr("class", "yBarLabel")
+      .attr("x", width - 10)
+      .attr("y", 20)
+      .attr("text-anchor", "start")
+      //   .attr("font-family", "calibri")
+      .style("fill", "black")
+      .style("font-size", 10)
+      .text("kCAD")
+      .attr("opacity", 0);
+
     // axis: leave for activate function
     // // call the axis and hide them
     // g.select(".x.topAxis").call(xAxisBar).style("opacity", 0);
@@ -1167,7 +1178,7 @@ var scrollVis = function () {
         .attr("y", yLineCPIScale(lastCPI) - 5)
         .transition()
         .duration(fadeOutDuration)
-        .text(`${subName}: ${lastCPI.toFixed(4)}`)
+        .text(`${subName}: ${(lastCPI * 100).toFixed(2)}%`)
         .style("font-size", fontSize);
     }
   }
@@ -1436,6 +1447,10 @@ var scrollVis = function () {
       .transition()
       .duration(fadeOutDuration)
       .attr("opacity", 0);
+    g.selectAll(".yBarLabel")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
 
     // show new
     g.selectAll(".unsafeBall")
@@ -1491,6 +1506,10 @@ var scrollVis = function () {
       .attr("width", 0);
 
     // shows now
+    g.selectAll(".yBarLabel")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 1);
     g.selectAll(".fundingBar")
       .transition("showBar")
       .duration(fadeOutDuration)
@@ -1571,6 +1590,10 @@ var scrollVis = function () {
    */
   function reOrderBar() {
     // hide next -- redraw
+    g.selectAll(".yBarLabel")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 1);
 
     // draw new
     dataDict["phdFundingSorted"] = dataDict["phdFunding"]
@@ -1630,6 +1653,10 @@ var scrollVis = function () {
   function closingTitle() {
     // hide previous
     hideAxis("topAxis");
+    g.selectAll(".yBarLabel")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
     g.selectAll(".fundingBar")
       .transition()
       .duration(fadeOutDuration)
