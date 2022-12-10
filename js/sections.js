@@ -764,15 +764,16 @@ var scrollVis = function () {
     activateFunctions[1] = showCPILine;
     activateFunctions[2] = show12MonthCPILine;
     activateFunctions[3] = showMultiLines;
-    activateFunctions[4] = highLightLines;
-    activateFunctions[5] = showScatter;
-    activateFunctions[6] = highLightScatter;
-    activateFunctions[7] = afterSupportScatter;
-    activateFunctions[8] = showSafeBalls;
-    activateFunctions[9] = showBar;
-    activateFunctions[10] = showReverseBar;
-    activateFunctions[11] = reOrderBar;
-    activateFunctions[12] = closingTitle;
+    activateFunctions[4] = highLightHouseLines;
+    activateFunctions[5] = highLightFoodTransLines;
+    activateFunctions[6] = showScatter;
+    activateFunctions[7] = highLightScatter;
+    activateFunctions[8] = afterSupportScatter;
+    activateFunctions[9] = showSafeBalls;
+    activateFunctions[10] = showBar;
+    activateFunctions[11] = showReverseBar;
+    activateFunctions[12] = reOrderBar;
+    activateFunctions[13] = closingTitle;
 
     // updateFunctions are called while
     // in a particular section to update
@@ -864,7 +865,7 @@ var scrollVis = function () {
   function showCPILine() {
     // hide previous
     g.selectAll(".title")
-      .transition()
+      .transition("hideTitle")
       .duration(fadeOutDuration)
       .attr("opacity", 0);
 
@@ -907,6 +908,7 @@ var scrollVis = function () {
       .transition()
       .duration(500)
       .ease(d3.easeLinear)
+      .attr("opacity", lineOpacity)
       .attr("d", lineCollections["allItems"])
       // .attr("stroke-dasharray", `${this.node().getTotalLength()},0`);
       .attr("stroke-dasharray", `${lineLengthCollections["allItems"]},0`);
@@ -939,11 +941,13 @@ var scrollVis = function () {
     g.selectAll(".CPILegend .MainLegend")
       .transition()
       .duration(fadeOutDuration)
-      .text("12-month % change");
+      .text("12-month % change")
+      .attr("opacity", 1);
     g.selectAll(".CPILegend .SubLegend")
       .transition()
       .duration(fadeOutDuration)
-      .text("Compared to last year");
+      .text("Compared to last year")
+      .attr("opacity", 1);
 
     // MUST reset the line scale's domain (to hide previous and following)
     xLineCPIScale.domain(
@@ -1095,7 +1099,7 @@ var scrollVis = function () {
    * shows now: linechart
    *
    */
-  function highLightLines() {
+  function highLightHouseLines() {
     // hide previous
     // legend
     g.selectAll(".CPILegend")
@@ -1108,19 +1112,28 @@ var scrollVis = function () {
       .transition()
       .duration(fadeOutDuration - 100)
       .attr("opacity", 0.2);
-    g.selectAll(".CPILine")
-      .transition()
-      .duration(fadeOutDuration - 100)
-      .attr("opacity", 0.2);
     g.selectAll(".multiCPILineLabels")
       .transition()
       .duration(fadeOutDuration - 100)
       .attr("opacity", 0.2);
+    g.selectAll(".CPILine")
+      .transition()
+      .duration(fadeOutDuration - 100)
+      .attr("opacity", 0.2);
+
+    // hide next: food and transport highlighter
+    subCPIHighlightHide("FoodMonthCPI", "food");
+    subCPIHighlightHide("TransportationMonthCPI", "transport");
+
+    // shows now
+    subCPIHighlight("ShelterMonthCPI", "house", houseLastCPI);
+  }
+
+  function highLightFoodTransLines() {
+    // hide previous: house highlight
+    subCPIHighlightHide("ShelterMonthCPI", "house");
 
     // hide next: scatterplot
-    // redraw axis!
-    showAxis(xAxisLine, "bottomAxis", yAxisLine, "leftAxis"); // update
-
     g.selectAll(".originalDot")
       .transition()
       .duration(fadeOutDuration)
@@ -1137,52 +1150,93 @@ var scrollVis = function () {
       .transition()
       .duration(fadeOutDuration)
       .attr("opacity", 0);
+    // redraw some parts
+    showAxis(xAxisLine, "bottomAxis", yAxisLine, "leftAxis"); // update
+    g.selectAll(".multiCPILine")
+      .transition()
+      .duration(fadeOutDuration - 100)
+      .attr("opacity", 0.2);
+    g.selectAll(".multiCPILineLabels")
+      .transition()
+      .duration(fadeOutDuration - 100)
+      .attr("opacity", 0.2);
+    g.selectAll(".CPILine")
+      .transition()
+      .duration(fadeOutDuration - 100)
+      .attr("opacity", 0.2);
 
     // shows now
     subCPIHighlight("FoodMonthCPI", "food", foodLastCPI);
-    subCPIHighlight("ShelterMonthCPI", "house", houseLastCPI);
     subCPIHighlight("TransportationMonthCPI", "transport", transLastCPI);
-
-    function subCPIHighlight(subCPI, subName, lastCPI) {
-      g.selectAll(`.multiCPILine.${subCPI}`)
-        .transition()
-        .duration(fadeOutDuration - 100)
-        // .style("stroke-width", 2 + 10)
-        .attr("opacity", lineOpacity);
-      g.selectAll(`.multiCPILineLabels.${subCPI}`)
-        .transition()
-        .duration(0)
-        // .style("font-size", fontSize + 20)
-        .attr("opacity", 1);
-
-      // auxiliary line for highlighter
-      g.append("g")
-        .attr("class", `${subName} LineAuxi`)
-        .append("line")
-        .attr("class", `${subName} HLine`)
-        .attr("x1", width)
-        .attr("x2", width)
-        .attr("y1", yLineCPIScale(lastCPI))
-        .attr("y2", yLineCPIScale(lastCPI))
-        .attr("stroke", "grey")
-        .attr("opacity", 0.8)
-        .attr("stroke-dasharray", "3,2")
-        .transition()
-        .duration(fadeOutDuration)
-        .attr("x2", 0);
-
-      g.select(`.${subName}.LineAuxi`)
-        .append("text")
-        .attr("class", `${subName} HLineLabel`)
-        .attr("x", 10)
-        .attr("y", yLineCPIScale(lastCPI) - 5)
-        .transition()
-        .duration(fadeOutDuration)
-        .text(`${subName}: ${(lastCPI * 100).toFixed(2)}%`)
-        .style("font-size", fontSize);
-    }
   }
 
+  /**
+   * subCPIHighlightHide - linechart
+   *
+   * helper function.
+   */
+  function subCPIHighlightHide(subCPI, subName) {
+    g.selectAll(`.multiCPILine.${subCPI}`)
+      .transition()
+      .duration(fadeOutDuration - 100)
+      .attr("opacity", 0.2);
+    g.selectAll(`.multiCPILineLabels.${subCPI}`)
+      .transition()
+      .duration(fadeOutDuration - 100)
+      .attr("opacity", 0.2);
+    g.selectAll(`.HLine.${subName}`)
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("x2", width);
+    g.selectAll(`.HLineLabel.${subName}`)
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
+  }
+
+  /**
+   * subCPIHighlight - linechart
+   *
+   * helper function.
+   */
+  function subCPIHighlight(subCPI, subName, lastCPI) {
+    g.selectAll(`.multiCPILine.${subCPI}`)
+      .transition()
+      .duration(fadeOutDuration - 100)
+      // .style("stroke-width", 2 + 10)
+      .attr("opacity", lineOpacity);
+    g.selectAll(`.multiCPILineLabels.${subCPI}`)
+      .transition()
+      .duration(0)
+      // .style("font-size", fontSize + 20)
+      .attr("opacity", 1);
+
+    // auxiliary line for highlighter
+    g.append("g")
+      .attr("class", `${subName} LineAuxi`)
+      .append("line")
+      .attr("class", `${subName} HLine`)
+      .attr("x1", width)
+      .attr("x2", width)
+      .attr("y1", yLineCPIScale(lastCPI))
+      .attr("y2", yLineCPIScale(lastCPI))
+      .attr("stroke", "grey")
+      .attr("opacity", 0.8)
+      .attr("stroke-dasharray", "3,2")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("x2", 0);
+
+    g.select(`.${subName}.LineAuxi`)
+      .append("text")
+      .attr("class", `${subName} HLineLabel`)
+      .attr("x", 10)
+      .attr("y", yLineCPIScale(lastCPI) - 5)
+      .transition()
+      .duration(fadeOutDuration)
+      .text(`${subName}: ${(lastCPI * 100).toFixed(2)}%`)
+      .style("font-size", fontSize);
+  }
   /**
    * showScatter - scatterplot
    *
