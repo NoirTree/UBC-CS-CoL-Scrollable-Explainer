@@ -27,7 +27,7 @@ var scrollVis = function () {
   // d3 selection that will be used
   // for displaying visualizations
   var g = null;
-
+  var embedg = null;
   // We will set up elements that are independent of data.
   // @v4 using new scale names
 
@@ -149,16 +149,19 @@ var scrollVis = function () {
       // svg = svg.merge(svgE);
 
       // directly append a new svg without entering data
-      svg = d3.select(this).append("svg");
+      // svg = d3.select(this).append("svg");
+      svg = d3.select(this).select("svg");
 
       svg.attr("width", width + margin.left + margin.right);
       svg.attr("height", height + margin.top + margin.bottom);
 
+      // // set the frame of obervable-embd g
+      // svg.select("#observable-embed").attr("transform", "translate(0,-500)");
+
       // Add a group. this group element will be
       // used to contain all other elements.
-      svg.append("g");
       g = svg
-        .select("g")
+        .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       // for test
@@ -692,7 +695,7 @@ var scrollVis = function () {
       })
       .attr("opacity", scatterOpacity);
 
-    g.selectAll(".colorLegend").transition().attr("opacity", 0);
+    g.selectAll(".colorLegend").attr("opacity", 0);
   };
 
   /**
@@ -760,20 +763,22 @@ var scrollVis = function () {
   var setupSections = function () {
     // activateFunctions are called each
     // time the active section changes
-    activateFunctions[0] = showTitle;
-    activateFunctions[1] = showCPILine;
-    activateFunctions[2] = show12MonthCPILine;
-    activateFunctions[3] = showMultiLines;
-    activateFunctions[4] = highLightHouseLines;
-    activateFunctions[5] = highLightFoodTransLines;
-    activateFunctions[6] = showScatter;
-    activateFunctions[7] = highLightScatter;
-    activateFunctions[8] = afterSupportScatter;
-    activateFunctions[9] = showSafeBalls;
-    activateFunctions[10] = showBar;
-    activateFunctions[11] = showReverseBar;
-    activateFunctions[12] = reOrderBar;
-    activateFunctions[13] = closingTitle;
+    activateFunctions[0] = showTreeMap;
+    activateFunctions[1] = zoomTreeMap;
+    activateFunctions[2] = showTitle;
+    activateFunctions[3] = showCPILine;
+    activateFunctions[4] = show12MonthCPILine;
+    activateFunctions[5] = showMultiLines;
+    activateFunctions[6] = highLightHouseLines;
+    activateFunctions[7] = highLightFoodTransLines;
+    activateFunctions[8] = showScatter;
+    activateFunctions[9] = highLightScatter;
+    activateFunctions[10] = afterSupportScatter;
+    activateFunctions[11] = showSafeBalls;
+    activateFunctions[12] = showBar;
+    activateFunctions[13] = showReverseBar;
+    activateFunctions[14] = reOrderBar;
+    activateFunctions[15] = closingTitle;
 
     // updateFunctions are called while
     // in a particular section to update
@@ -853,6 +858,20 @@ var scrollVis = function () {
         .on("end", propmtMovement);
     }
   }
+
+  function showTreeMap() {
+    // d3.select("#vis")
+    //   .html("")
+    //   .html(
+    //     '<div id="observablehq-chart-4e50ac71"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@observablehq/inspector@5/dist/inspector.css"/><script type="module">import {Runtime,Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@5/dist/runtime.js";import define from "https://api.observablehq.com/d/463799c44458bafb.js?v=3";new Runtime().module(define, (name) => {if (name === "chart") return new Inspector(document.querySelector("#observablehq-chart-4e50ac71"));});</script>'
+    //   );
+    // d3.select("#vis")
+    // embedg.html(
+    //   '<div id="observablehq-chart-4e50ac71"></div><p>Credit: <a href="https://observablehq.com/d/463799c44458bafb">Fork Zoomable Treemap by tommy</a></p><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@observablehq/inspector@5/dist/inspector.css"><script type="module">import {Runtime, Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@5/dist/runtime.js";import define from "https://api.observablehq.com/d/463799c44458bafb.js?v=3";new Runtime().module(define, name => {if (name === "chart") return new Inspector(document.querySelector("#observablehq-chart-4e50ac71"));});</script>'
+    // );
+  }
+
+  function zoomTreeMap() {}
 
   /**
    * showCPILine - linechart

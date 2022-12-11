@@ -16,6 +16,16 @@
             UBC CS graduate students.
           </section>
           <section class="step">
+            <div class="title">What expenses look like</div>
+            This is the breakdown of monthly expenses of a typical UBC CS grad
+            student.
+          </section>
+          <section class="step">
+            <div class="title">Basic expenses</div>
+            <p>Here, we will focus on basic expenses.</p>
+            <p>As you can see, rent accounts for most of the basic expenses.</p>
+          </section>
+          <section class="step">
             <div class="title">Inflation Rate at British Columbia</div>
             <p>
               CPI is a common indicator of inflation rate. It is the ratio of
@@ -155,7 +165,23 @@
             </p>
           </section>
         </div>
-        <div id="vis"></div>
+        <div id="vis">
+          <svg>
+            <g id="observable-embed" border="3px dashed green">
+              <div id="observablehq-chart-a4179335"></div>
+              <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@observablehq/inspector@5/dist/inspector.css">
+              <script type="module">
+              import {Runtime, Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@5/dist/runtime.js";
+              import define from "https://api.observablehq.com/d/463799c44458bafb.js?v=3";
+              new Runtime().module(define, name => {
+                if (name === "chart") return new Inspector(document.querySelector("#observablehq-chart-a4179335"));
+              });
+              </script>
+          </g> 
+        </svg>
+        </div>
+        </div>
+
         <div id="extra-space"></div>
       </div>
     </div>
