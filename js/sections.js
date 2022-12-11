@@ -1045,7 +1045,7 @@ var scrollVis = function () {
     // Add the re-drawn line
     g.select(".CPILine")
       .transition()
-      .duration(fadeOutDuration + 300)
+      .duration(fadeOutDuration + 500)
       .ease(d3.easeQuadInOut)
       .attr("d", lineCollections["allItems22"])
       .attr("stroke-dasharray", `${lineLengthCollections["allItems22"]},0`)
@@ -1073,7 +1073,7 @@ var scrollVis = function () {
     // add to the graph
     g.selectAll(".multiCPILine")
       .transition()
-      .duration(fadeOutDuration)
+      .duration(fadeOutDuration + 500)
       // .delay(600)
       .attr("d", function (d) {
         return lineCollections["multi"](d.values);
@@ -1086,7 +1086,7 @@ var scrollVis = function () {
           ${yLineCPIScale(d.value.value) + 10})`;
       })
       .transition()
-      .duration(fadeOutDuration)
+      .duration(fadeOutDuration + 500)
       // .delay(600)
       .attr("opacity", 1);
   }
