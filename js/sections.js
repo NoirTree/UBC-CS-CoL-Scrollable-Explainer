@@ -419,7 +419,7 @@ var scrollVis = function () {
       .attr("width", 0) // first set to 0
       .attr("fill", function (d) {
         return d.University === "University of British Columbia"
-          ? "#32CD30"
+          ? "gold"
           : barColors["Funding"];
       })
       .attr("height", yBarScale.bandwidth())
@@ -442,11 +442,12 @@ var scrollVis = function () {
         return yBarScale(d.University);
       })
       .attr("width", 0) // first set to 0
-      .attr("fill", function (d) {
-        return d.University === "University of British Columbia"
-          ? "#ddcc00"
-          : barColors["col"];
-      })
+      .attr("fill", barColors["col"])
+      // .attr("fill", function (d) {
+      //   return d.University === "University of British Columbia"
+      //     ? "red"
+      //     : barColors["col"];
+      // })
       .attr("height", yBarScale.bandwidth())
       .attr("opacity", barOpacity);
 
@@ -465,7 +466,7 @@ var scrollVis = function () {
       })
       .attr("dy", yBarScale.bandwidth() / 1.2)
       .style("font-size", fontSize)
-      .attr("fill", "white")
+      .attr("fill", "black")
       .attr("opacity", 0);
   };
 
