@@ -10,7 +10,7 @@ var scrollVis = function () {
   var width = 600; // width of real graph
   var height = 450;
   var margin = { top: 20, left: 40, bottom: 40, right: 20 }; // margin between graph and <svg> it appends
-  var SectionNumbers = 9; // how many sections we have in total
+  // var SectionNumbers = activateFunctions.length; // how many sections we have in total
   var fadeOutDuration = 500;
   var fontSize = 12;
   // Keep track of which visualization
@@ -762,19 +762,22 @@ var scrollVis = function () {
     // activateFunctions are called each
     // time the active section changes
     activateFunctions[0] = showTitle;
-    activateFunctions[1] = showCPILine;
-    activateFunctions[2] = show12MonthCPILine;
-    activateFunctions[3] = showMultiLines;
-    activateFunctions[4] = highLightHouseLines;
-    activateFunctions[5] = highLightFoodTransLines;
-    activateFunctions[6] = showScatter;
-    activateFunctions[7] = highLightScatter;
-    activateFunctions[8] = afterSupportScatter;
-    activateFunctions[9] = showSafeBalls;
-    activateFunctions[10] = showBar;
-    activateFunctions[11] = showReverseBar;
-    activateFunctions[12] = reOrderBar;
-    activateFunctions[13] = closingTitle;
+    activateFunctions[1] = showTreeMap;
+    activateFunctions[2] = zoomTreeMap;
+    activateFunctions[3] = showCPILine;
+    activateFunctions[4] = show12MonthCPILine;
+    activateFunctions[5] = showMultiLines;
+    activateFunctions[6] = highLightHouseLines;
+    activateFunctions[7] = highLightFoodTransLines;
+    activateFunctions[8] = showScatter;
+    activateFunctions[9] = highLightScatter;
+    activateFunctions[10] = afterSupportScatter;
+    activateFunctions[11] = showSafeBalls;
+    activateFunctions[12] = showLollipop;
+    activateFunctions[13] = showBar;
+    activateFunctions[14] = showReverseBar;
+    activateFunctions[15] = reOrderBar;
+    activateFunctions[16] = closingTitle;
 
     // updateFunctions are called while
     // in a particular section to update
@@ -782,10 +785,10 @@ var scrollVis = function () {
     // Most sections do not need to be updated
     // for all scrolling and so are set to
     // no-op functions.
-    for (var i = 0; i < SectionNumbers; i++) {
+    for (var i = 0; i < activateFunctions.length; i++) {
       updateFunctions[i] = function () {};
     }
-    updateFunctions[9] = updateSafeBalls;
+    updateFunctions[11] = updateSafeBalls;
   };
 
   /**
@@ -806,22 +809,14 @@ var scrollVis = function () {
   /**
    * showTitle - initial title
    *
-   * hides: count title
+   * hides: treemap
    * (no previous step to hide)
    * shows:
    *
    */
   function showTitle() {
     // hide next
-    hideAxis("bottomAxis", "leftAxis");
-    g.selectAll(".CPILegend .MainLegend, .CPILegend .SubLegend")
-      .transition()
-      .duration(fadeOutDuration)
-      .attr("opacity", 0);
-    g.selectAll(".CPILine")
-      .transition()
-      .duration(fadeOutDuration)
-      .attr("stroke-dasharray", `0,${lineLengthCollections["allItems"]}`);
+    // todo: hide treemap
 
     // show new
     g.selectAll(".title")
@@ -856,21 +851,62 @@ var scrollVis = function () {
   }
 
   /**
-   * showCPILine - linechart
+   * showTreeMap - Treemap
    *
-   * hides previous:
-   * hides next: legend
-   * shows now: linechart
+   * hides previous: Title
+   * hides next: zoom out
+   * shows now: treemap
    *
    */
-  function showCPILine() {
+  function showTreeMap() {
     // hide previous
     g.selectAll(".title")
       .transition("hideTitle")
       .duration(fadeOutDuration)
       .attr("opacity", 0);
 
-    // console.log("showCPILine is called!");
+    // hide next
+    // todo: zoom out
+
+    // show now
+    // todo: show treemap
+  }
+
+  /**
+   * showTreeMap - Treemap
+   *
+   * hides previous: Title
+   * hides next: linechart
+   * shows now: treemap
+   *
+   */
+  function zoomTreeMap() {
+    // hide previous+show now
+    // todo: zoom in
+
+    // hide next
+    hideAxis("bottomAxis", "leftAxis");
+    g.selectAll(".CPILegend .MainLegend, .CPILegend .SubLegend")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
+    g.selectAll(".CPILine")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("stroke-dasharray", `0,${lineLengthCollections["allItems"]}`);
+  }
+  /**
+   * showCPILine - linechart
+   *
+   * hides previous: treemap
+   * hides next: legend
+   * shows now: linechart
+   *
+   */
+  function showCPILine() {
+    // hide previous
+    // todo: hide treemap
+
     // hide next -- by rebound the "d"
 
     // show now
@@ -1374,7 +1410,7 @@ var scrollVis = function () {
    * showSafeBalls - safeBall
    *
    * hides previous: scatterplot
-   * hides next: barchart
+   * hides next: lollipop
    * shows now: safeBall
    *
    */
@@ -1422,6 +1458,50 @@ var scrollVis = function () {
       .attr("opacity", 0);
 
     // hide next
+    // todo: hide lollipop
+
+    // show new: reserve for progress function
+    // g.selectAll(".unsafeBall")
+    //   .transition()
+    //   .delay(200)
+    //   .duration(fadeOutDuration)
+    //   .attr("r", unsafeNum + adjustR);
+    // g.selectAll(".safeBall")
+    //   .transition()
+    //   .delay(200)
+    //   .duration(fadeOutDuration)
+    //   .attr("r", safeNum + adjustR);
+    // g.selectAll(".safeBalls.captions")
+    //   .transition()
+    //   .duration(fadeOutDuration)
+    //   .attr("opacity", 1);
+  }
+
+  /**
+   * showLollipop - Lollipop
+   *
+   * hides previous: safeBall
+   * hides next: barchart
+   * shows now: lollipop
+   *
+   */
+  function showLollipop() {
+    // hide previous
+    g.selectAll(".safeBalls.captions")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
+    g.selectAll(".unsafeBall")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("r", 0);
+    g.selectAll(".safeBall")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("r", 0);
+    // g.selectAll(".square").transition().duration(800).attr("opacity", 0);
+
+    // hide next: barchart
     hideAxis("topAxis", null);
     g.selectAll(".fundingBar")
       .transition()
@@ -1440,21 +1520,8 @@ var scrollVis = function () {
       .duration(fadeOutDuration)
       .attr("opacity", 0);
 
-    // show new
-    // g.selectAll(".unsafeBall")
-    //   .transition()
-    //   .delay(200)
-    //   .duration(fadeOutDuration)
-    //   .attr("r", unsafeNum + adjustR);
-    // g.selectAll(".safeBall")
-    //   .transition()
-    //   .delay(200)
-    //   .duration(fadeOutDuration)
-    //   .attr("r", safeNum + adjustR);
-    // g.selectAll(".safeBalls.captions")
-    //   .transition()
-    //   .duration(fadeOutDuration)
-    //   .attr("opacity", 1);
+    // show now
+    // todo: show lollipop
   }
 
   /**
@@ -1470,19 +1537,7 @@ var scrollVis = function () {
     showAxis(xAxisBar, "topAxis", null, null);
 
     // hides previous:
-    g.selectAll(".safeBalls.captions")
-      .transition()
-      .duration(fadeOutDuration)
-      .attr("opacity", 0);
-    g.selectAll(".unsafeBall")
-      .transition()
-      .duration(fadeOutDuration)
-      .attr("r", 0);
-    g.selectAll(".safeBall")
-      .transition()
-      .duration(fadeOutDuration)
-      .attr("r", 0);
-    // g.selectAll(".square").transition().duration(800).attr("opacity", 0);
+    // todo: hide lollipop
 
     // hides next:
     g.selectAll(".colBar")
