@@ -169,7 +169,49 @@
             </p>
           </section>
         </div>
-        <div id="vis"></div>
+        <div id="vis">
+          <div id="observable-embed-lollipop">
+            <div id="observablehq-viewof-food_health-f01904ae"></div>
+            <div id="observablehq-viewof-utilities_commute-f01904ae"></div>
+            <div id="observablehq-your_avg-f01904ae"></div>
+            <div id="observablehq-lollipop_dm-f01904ae"></div>
+
+            <link
+              rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/@observablehq/inspector@5/dist/inspector.css"
+            />
+            <script type="module">
+              import {
+                Runtime,
+                Inspector
+              } from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@5/dist/runtime.js";
+              import define from "https://api.observablehq.com/d/e43198d9aa9f7758@555.js?v=3";
+              new Runtime().module(define, (name) => {
+                if (name === "viewof food_health")
+                  return new Inspector(
+                    document.querySelector(
+                      "#observablehq-viewof-food_health-f01904ae"
+                    )
+                  );
+                if (name === "viewof utilities_commute")
+                  return new Inspector(
+                    document.querySelector(
+                      "#observablehq-viewof-utilities_commute-f01904ae"
+                    )
+                  );
+                if (name === "your_avg")
+                  return new Inspector(
+                    document.querySelector("#observablehq-your_avg-f01904ae")
+                  );
+                if (name === "lollipop_dm")
+                  return new Inspector(
+                    document.querySelector("#observablehq-lollipop_dm-f01904ae")
+                  );
+                return ["avg_cost", "total_avg", "chart"].includes(name);
+              });
+            </script>
+          </div>
+        </div>
         <div id="extra-space"></div>
       </div>
     </div>

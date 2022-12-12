@@ -1459,6 +1459,10 @@ var scrollVis = function () {
 
     // hide next
     // todo: hide lollipop
+    d3.select("#observable-embed-lollipop")
+      .transition()
+      .duration(fadeOutDuration)
+      .style("opacity", 0);
 
     // show new: reserve for progress function
     // g.selectAll(".unsafeBall")
@@ -1522,6 +1526,11 @@ var scrollVis = function () {
 
     // show now
     // todo: show lollipop
+    d3.select("#observable-embed-lollipop")
+      .transition()
+      .duration(fadeOutDuration)
+      .style("opacity", 1);
+    // .style("display", "block");
   }
 
   /**
@@ -1538,6 +1547,11 @@ var scrollVis = function () {
 
     // hides previous:
     // todo: hide lollipop
+    d3.select("#observable-embed-lollipop")
+      .transition()
+      .duration(fadeOutDuration)
+      .style("opacity", 0);
+    // .style("display", "none");
 
     // hides next:
     g.selectAll(".colBar")
