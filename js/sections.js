@@ -9,6 +9,7 @@ var scrollVis = function () {
   // and margins of the vis area.
   var width = 600; // width of real graph
   var height = 450;
+  var tm_height = 600;
   var margin = { top: 20, left: 40, bottom: 40, right: 20 }; // margin between graph and <svg> it appends
   // var SectionNumbers = activateFunctions.length; // how many sections we have in total
   var fadeOutDuration = 500;
@@ -288,11 +289,16 @@ var scrollVis = function () {
       return d.value;
     }); // Here the size of each leave is given in the 'value' field in input data
 
+    var treeg = g
+      .append("g")
+      .attr("class", "treemapG")
+      .attr("transform", "translate(100, 0)");
     // Then d3.treemap computes the position of each element of the hierarchy
-    d3.treemap().size([width, height]).padding(2)(root);
+    d3.treemap().size([height, height]).padding(2)(root);
 
     // use this information to add rectangles:
-    g.selectAll("treeRect")
+    treeg
+      .selectAll("treeRect")
       .data(root.leaves())
       .enter()
       .append("rect")
@@ -313,7 +319,8 @@ var scrollVis = function () {
       .style("fill", "steelblue");
 
     // and to add the text labels
-    g.selectAll("treeText")
+    treeg
+      .selectAll("treeText")
       .data(root.leaves())
       .enter()
       .append("text")
@@ -330,7 +337,7 @@ var scrollVis = function () {
       .attr("font-size", "15px")
       .attr("fill", "black");
 
-    g.selectAll(".treeRect, .treeText").attr("opacity", 0);
+    treeg.selectAll(".treeRect, .treeText").attr("opacity", 0);
   };
 
   /**
@@ -382,7 +389,7 @@ var scrollVis = function () {
       .attr("id", "clip")
       .append("g:rect")
       .attr("width", width)
-      .attr("height", height)
+      .attr("height", tm_height)
       .attr("x", 0)
       .attr("y", 0);
 
