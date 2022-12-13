@@ -1606,11 +1606,11 @@ var scrollVis = function () {
   }
 
   /**
-   * showBar - barchart
+   * showDivergingBar - barchart
    *
    * hides previous: lollipop
    * hides next: reverse bar
-   * shows now: barchart
+   * shows now: overlappingBarchart
    *
    */
   function showDivergingBar() {
@@ -1677,13 +1677,16 @@ var scrollVis = function () {
       .transition()
       .duration(fadeOutDuration)
       .attr("opacity", 1);
+
+    // highlight UBC
+    flashHighlightBar();
   }
 
   /**
-   * showReverseBar - barchart
+   * showOverlappingBar - barchart
    *
-   * hides previous:
-   * hides next:
+   * hides previous: diverging barchart
+   * hides next: reordered barchart
    * shows now: barchart
    *
    */
@@ -1757,7 +1760,7 @@ var scrollVis = function () {
   /**
    * reOrderBar - barchart
    *
-   * hides previous:
+   * hides previous: overlaping barchart (original order)
    * hides next:
    * shows now: barchart
    *
@@ -1815,6 +1818,8 @@ var scrollVis = function () {
       .attr("y", function (d) {
         return yBarScale(d.University);
       });
+
+    flashHighlightBar();
   }
   /**
    * closingTitle
@@ -1954,6 +1959,35 @@ var scrollVis = function () {
       .duration(fadeOutDuration)
       .text(`${subName}: ${(lastCPI * 100).toFixed(2)}%`)
       .style("font-size", fontSize);
+  }
+
+  /**
+   * flashHighlightBar - barChart
+   *
+   * helper function to hightlight UBC.
+   */
+  function flashHighlightBar(
+    delay = 600,
+    duration = fadeOutDuration,
+    repeat = 2
+  ) {
+    for (var i = 0; i < repeat; i++) {
+      g.selectAll(".highlightBar")
+        .transition()
+        .delay(delay + duration * 2 * i)
+        .duration(duration)
+        .attr("fill", "gold");
+      g.select(".highlightBar.colBar")
+        .transition()
+        .delay(delay + duration + duration * 2 * i)
+        .duration(duration)
+        .attr("fill", barColors["col"]);
+      g.select(".highlightBar.fundingBar")
+        .transition()
+        .delay(delay + duration + duration * 2 * i)
+        .duration(duration)
+        .attr("fill", barColors["Funding"]);
+    }
   }
 
   /**
