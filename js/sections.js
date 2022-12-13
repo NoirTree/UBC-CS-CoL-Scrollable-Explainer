@@ -195,6 +195,7 @@ var scrollVis = function () {
 
       // setup vis components
       setupTitle();
+      setupTreemap();
       setupLineVis();
       setupScatterVis();
       setupBarVis(); // can add more data as multiple parameters. See the original design
@@ -259,9 +260,78 @@ var scrollVis = function () {
       .attr("points", "0 0, 30 45, 60 0")
       .attr("stroke", "grey")
       .attr("fill", "grey")
-      .attr("transform", `translate(300, ${height - 100})`) //is there a way to center this? - Dev
+      .attr("transform", `translate(50, ${height - 100})`) //is there a way to center this? - Dev
       .attr("opacity", 0);
   }
+
+  /**
+   * setupTreemap - creates initial elements for treemap
+   * sections of the visualization.
+   *
+   */
+  var setupTreemap = function () {
+    dataDict["treeData"] = {
+      name: "basic expenses",
+      children: [
+        { name: "food", value: 350 },
+        { name: "social", value: 200 },
+        { name: "health", value: 115 },
+        { name: "utilities", value: 90 },
+        { name: "housing", value: 1400 },
+        { name: "commute", value: 90 }
+      ]
+    };
+    var treedata = dataDict["treeData"];
+
+    // Give the data to this cluster layout:
+    var root = d3.hierarchy(treedata).sum(function (d) {
+      return d.value;
+    }); // Here the size of each leave is given in the 'value' field in input data
+
+    // Then d3.treemap computes the position of each element of the hierarchy
+    d3.treemap().size([width, height]).padding(2)(root);
+
+    // use this information to add rectangles:
+    g.selectAll("treeRect")
+      .data(root.leaves())
+      .enter()
+      .append("rect")
+      .attr("class", "treeRect")
+      .attr("x", function (d) {
+        return d.x0;
+      })
+      .attr("y", function (d) {
+        return d.y0;
+      })
+      .attr("width", function (d) {
+        return d.x1 - d.x0;
+      })
+      .attr("height", function (d) {
+        return d.y1 - d.y0;
+      })
+      .style("stroke", "black")
+      .style("fill", "steelblue");
+
+    // and to add the text labels
+    g.selectAll("treeText")
+      .data(root.leaves())
+      .enter()
+      .append("text")
+      .attr("class", "treeText")
+      .attr("x", function (d) {
+        return d.x0 + 5;
+      }) // +10 to adjust position (more right)
+      .attr("y", function (d) {
+        return d.y0 + 20;
+      }) // +20 to adjust position (lower)
+      .text(function (d) {
+        return d.data.name;
+      })
+      .attr("font-size", "15px")
+      .attr("fill", "black");
+
+    g.selectAll(".treeRect, .treeText").attr("opacity", 0);
+  };
 
   /**
    * setupLineVis - creates initial elements for Line
@@ -863,21 +933,21 @@ var scrollVis = function () {
     // time the active section changes
     activateFunctions[0] = showTitle;
     activateFunctions[1] = showTreeMap;
-    activateFunctions[2] = zoomTreeMap;
-    activateFunctions[3] = showCPILine;
-    activateFunctions[4] = show12MonthCPILine;
-    activateFunctions[5] = showMultiLines;
-    activateFunctions[6] = highLightHouseLines;
-    activateFunctions[7] = highLightFoodTransLines;
-    activateFunctions[8] = showScatter;
-    activateFunctions[9] = highLightScatter;
-    activateFunctions[10] = afterSupportScatter;
-    activateFunctions[11] = showSafeBalls;
-    activateFunctions[12] = showLollipop;
-    activateFunctions[13] = showDivergingBar;
-    activateFunctions[14] = showOverlappingBar;
-    activateFunctions[15] = reOrderBar;
-    activateFunctions[16] = closingTitle;
+    // activateFunctions[2] = zoomTreeMap;
+    activateFunctions[2] = showCPILine;
+    activateFunctions[3] = show12MonthCPILine;
+    activateFunctions[4] = showMultiLines;
+    activateFunctions[5] = highLightHouseLines;
+    activateFunctions[6] = highLightFoodTransLines;
+    activateFunctions[7] = showScatter;
+    activateFunctions[8] = highLightScatter;
+    activateFunctions[9] = afterSupportScatter;
+    activateFunctions[10] = showSafeBalls;
+    activateFunctions[11] = showLollipop;
+    activateFunctions[12] = showDivergingBar;
+    activateFunctions[13] = showOverlappingBar;
+    activateFunctions[14] = reOrderBar;
+    activateFunctions[15] = closingTitle;
 
     // updateFunctions are called while
     // in a particular section to update
@@ -888,7 +958,7 @@ var scrollVis = function () {
     for (var i = 0; i < activateFunctions.length; i++) {
       updateFunctions[i] = function () {};
     }
-    updateFunctions[11] = updateSafeBalls;
+    updateFunctions[10] = updateSafeBalls;
   };
 
   /**
@@ -917,6 +987,10 @@ var scrollVis = function () {
   function showTitle() {
     // hide next
     // todo: hide treemap
+    g.selectAll(".treeRect, .treeText")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
 
     // show new
     g.selectAll(".title")
@@ -966,10 +1040,22 @@ var scrollVis = function () {
       .attr("opacity", 0);
 
     // hide next
-    // todo: zoom out
+    hideAxis("bottomAxis", "leftAxis");
+    g.selectAll(".CPILegend .MainLegend, .CPILegend .SubLegend")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
+    g.selectAll(".CPILine")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("stroke-dasharray", `0,${lineLengthCollections["allItems"]}`);
 
     // show now
     // todo: show treemap
+    g.selectAll(".treeRect, .treeText")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 1);
   }
 
   /**
@@ -983,18 +1069,9 @@ var scrollVis = function () {
   function zoomTreeMap() {
     // hide previous+show now
     // todo: zoom in
-
     // hide next
-    hideAxis("bottomAxis", "leftAxis");
-    g.selectAll(".CPILegend .MainLegend, .CPILegend .SubLegend")
-      .transition()
-      .duration(fadeOutDuration)
-      .attr("opacity", 0);
-    g.selectAll(".CPILine")
-      .transition()
-      .duration(fadeOutDuration)
-      .attr("stroke-dasharray", `0,${lineLengthCollections["allItems"]}`);
   }
+
   /**
    * showCPILine - linechart
    *
@@ -1006,6 +1083,10 @@ var scrollVis = function () {
   function showCPILine() {
     // hide previous
     // todo: hide treemap
+    g.selectAll(".treeRect, .treeText")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
 
     // hide next -- by rebound the "d"
 
@@ -1043,8 +1124,9 @@ var scrollVis = function () {
     g.selectAll(".CPILine")
       // .attr("stroke-dasharray", `0,${lineLengthCollections["allItems"]}`)
       .transition()
-      .duration(500)
+      .duration(fadeOutDuration + 200)
       .ease(d3.easeLinear)
+      .delay(300)
       .attr("opacity", lineOpacity)
       .attr("d", lineCollections["allItems"])
       // .attr("stroke-dasharray", `${this.node().getTotalLength()},0`);
@@ -1122,6 +1204,7 @@ var scrollVis = function () {
       .transition()
       .duration(500)
       .ease(d3.easeLinear)
+      .delay(300)
       .attr("d", lineCollections["allItemsMonth"])
       .attr("stroke-dasharray", `${lineLengthCollections["allItemsMonth"]},0`)
       .attr("opacity", lineOpacity);
