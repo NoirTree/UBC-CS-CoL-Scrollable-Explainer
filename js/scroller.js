@@ -1,4 +1,3 @@
-
 /**
  * scroller - handles the details
  * of figuring out which section
@@ -7,9 +6,9 @@
  *
  */
 function scroller() {
-  var container = d3.select('body');
+  var container = d3.select("body");
   // event dispatcher
-  var dispatch = d3.dispatch('active', 'progress');
+  var dispatch = d3.dispatch("active", "progress");
 
   // d3 selection of all the
   // text sections that will
@@ -40,8 +39,8 @@ function scroller() {
     // position. When it is resized
     // call resize.
     d3.select(window)
-      .on('scroll.scroller', position)
-      .on('resize.scroller', resize);
+      .on("scroll.scroller", position)
+      .on("resize.scroller", resize);
 
     // manually call resize
     // initially to setup
@@ -80,7 +79,8 @@ function scroller() {
       }
       sectionPositions.push(top - startPos);
     });
-    containerStart = container.node().getBoundingClientRect().top + window.pageYOffset;
+    containerStart =
+      container.node().getBoundingClientRect().top + window.pageYOffset;
   }
 
   /**
@@ -97,7 +97,7 @@ function scroller() {
 
     if (currentIndex !== sectionIndex) {
       // @v4 you now `.call` the dispatch callback
-      dispatch.call('active', this, sectionIndex);
+      dispatch.call("active", this, sectionIndex);
       currentIndex = sectionIndex;
     }
 
@@ -105,7 +105,7 @@ function scroller() {
     var prevTop = sectionPositions[prevIndex];
     var progress = (pos - prevTop) / (sectionPositions[sectionIndex] - prevTop);
     // @v4 you now `.call` the dispatch callback
-    dispatch.call('progress', this, currentIndex, progress);
+    dispatch.call("progress", this, currentIndex, progress);
   }
 
   /**

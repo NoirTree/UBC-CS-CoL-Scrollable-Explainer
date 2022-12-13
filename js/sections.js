@@ -91,7 +91,7 @@ var scrollVis = function () {
   var yAxisScatter = d3.axisLeft().scale(yScatterScale);
   var scatterR = 4;
   var scatterOpacity = 0.5;
-  var program_lst = ["MSc (12-credit thesis)", "PhD", "PhD Track"];
+  var program_lst = ["MSc", "PhD", "PhD-Track"];
   var financial_status_lst = [
     "always_enough",
     "enough_after_support",
@@ -105,6 +105,7 @@ var scrollVis = function () {
   // shape scale: programs
   var scatterShape = d3.scaleOrdinal(d3.symbols);
   var scatterSymbol = d3.symbol();
+  var originalTextConent = d3.select(".scatter-final-content").node().innerHTML;
 
   /**
    * Safeball
@@ -645,7 +646,7 @@ var scrollVis = function () {
       .enter()
       .append("path")
       .attr("class", function (d) {
-        return "originalDot " + d.financial_status;
+        return "originalDot " + d.financial_status + " " + d.program;
       })
       .attr("d", (d) => scatterSymbol.type(scatterShape(d.program)).size(75)())
       .attr("transform", function (d) {
@@ -662,7 +663,9 @@ var scrollVis = function () {
       .data(coldata)
       .enter()
       .append("path")
-      .attr("class", "afterDot")
+      .attr("class", function (d) {
+        return "afterDot " + d.financial_status + " " + d.program;
+      })
       .attr("d", (d) => scatterSymbol.type(scatterShape(d.program)).size(75)())
       .attr("transform", function (d) {
         return `translate(${xScatterScale(
@@ -681,7 +684,9 @@ var scrollVis = function () {
       .data(coldata)
       .enter()
       .append("line")
-      .attr("class", "connectLine")
+      .attr("class", function (d) {
+        return "connectLine " + d.program;
+      })
       .attr("x2", function (d) {
         return xScatterScale(d.basic_expenses);
       })
@@ -762,6 +767,33 @@ var scrollVis = function () {
       .attr("opacity", scatterOpacity);
 
     g.selectAll(".colorLegend").transition().attr("opacity", 0);
+
+    // selectList
+    d3.select("#vis").append("select").attr("id", "scatterSelectButton");
+    // add the options to the button
+    var buttonOptions = [...program_lst];
+    buttonOptions.push("All");
+    d3.select("#scatterSelectButton")
+      .selectAll("scatterOptions")
+      .data(buttonOptions)
+      .enter()
+      .append("option")
+      .attr("class", "scatterOptions")
+      .text(function (d) {
+        return d;
+      }) // text showed in the menu
+      .attr("value", function (d) {
+        return d;
+      }) // corresponding value returned by the button
+      .attr("selected", function (d) {
+        if (d === "All") {
+          return true;
+        } else {
+          return false;
+        }
+      });
+
+    d3.select("#scatterSelectButton").attr("hidden", "hidden");
   };
 
   /**
@@ -1377,12 +1409,17 @@ var scrollVis = function () {
         )},${yScatterScale(d.basic_income)})`;
       })
       .style("stroke", "black")
-      .style("fill", "grey");
+      .style("fill", "grey")
+      .attr("opacity", scatterOpacity);
 
     g.selectAll(".colorLegend")
       .transition("hideColorLegend")
       .duration(fadeOutDuration)
       .attr("opacity", 0);
+    d3.select("#scatterSelectButton")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("hidden", "hidden");
 
     // show now
     g.selectAll(".scatterCaption")
@@ -1390,7 +1427,9 @@ var scrollVis = function () {
       .duration(fadeOutDuration)
       .attr("opacity", 1);
 
-    g.selectAll(".still_not_enough, .enough_after_support")
+    g.selectAll(
+      ".originalDot.still_not_enough, .originalDot.enough_after_support"
+    )
       .transition()
       .duration(fadeOutDuration)
       .attr("opacity", Math.min(1, scatterOpacity + 0.2))
@@ -1398,6 +1437,14 @@ var scrollVis = function () {
       .style("fill", "red");
   }
 
+  /**
+   * afterSupportScatter - scatterplot
+   *
+   * hides previous: highlight scatter
+   * hides next: safeBall
+   * shows now: afterdots+change style+filter list
+   *
+   */
   function afterSupportScatter() {
     // hide previous
     // hide captions
@@ -1453,6 +1500,7 @@ var scrollVis = function () {
       .transition()
       .delay(200)
       .duration(fadeOutDuration)
+      .attr("opacity", scatterOpacity)
       .attr("y1", function (d) {
         return yScatterScale(d.supported_income);
       });
@@ -1472,6 +1520,78 @@ var scrollVis = function () {
       .transition()
       .duration(fadeOutDuration)
       .attr("opacity", 1);
+
+    // to-do: add a filter and change the content
+    d3.select("#scatterSelectButton")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("hidden", null);
+
+    d3.selectAll(".scatterOptions").attr("selected", function (d) {
+      if (d === "All") {
+        return true;
+      } else {
+        return false;
+      }
+    });
+    d3.select(".scatter-final-content").html(originalTextConent);
+
+    // When the button is changed, run the updateChart function
+    d3.select("#scatterSelectButton").on("change", function (d) {
+      // recover the option that has been chosen
+      var selectedOption = d3.select(this).property("value");
+      // run the updateChart function with this selected option
+      updateScatterByChoice(selectedOption);
+    });
+
+    // updateScatterByChoice("All");
+  }
+
+  function updateScatterByChoice(selectedGroup) {
+    // if chosen all, return all
+    console.log(selectedGroup);
+    if (selectedGroup === "All") {
+      d3.selectAll(".PhD-Track, .MSc, .PhD")
+        .transition()
+        .duration(fadeOutDuration)
+        .attr("opacity", scatterOpacity);
+      d3.select(".scatter-final-content").html(originalTextConent);
+    } else {
+      // show the selected group and hide others
+      d3.selectAll(`.PhD, .PhD-Track, .MSc`)
+        .transition()
+        .duration(fadeOutDuration)
+        .attr("opacity", 0);
+      d3.selectAll(`.${selectedGroup}`)
+        .transition()
+        .duration(fadeOutDuration)
+        .attr("opacity", scatterOpacity);
+
+      switch (selectedGroup) {
+        case "PhD": {
+          d3.select(".scatter-final-content").html("<p>This is for PhD.</p>"); //cannot have transition (not in svg)
+          break;
+        }
+        case "MSc": {
+          d3.select(".scatter-final-content").html("<p>This is for MSc.</p>");
+          break;
+        }
+        case "PhD-Track": {
+          d3.select(".scatter-final-content").html(
+            "<p>This is for PhD-Track.</p>"
+          );
+          break;
+        }
+        default: {
+          d3.selectAll(".PhD-Track, .MSc, .PhD")
+            .transition()
+            .duration(fadeOutDuration)
+            .attr("opacity", scatterOpacity);
+          d3.select(".scatter-final-content").html(originalTextConent);
+          break;
+        }
+      }
+    }
   }
 
   /**
@@ -1486,6 +1606,12 @@ var scrollVis = function () {
     // will moveto setup later
 
     // hide previous
+    d3.select(".scatter-final-content").html(originalTextConent);
+
+    d3.select("#scatterSelectButton")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("hidden", "hidden");
     hideAxis("bottomAxis", "leftAxis");
     g.selectAll(".connectLine")
       .transition()

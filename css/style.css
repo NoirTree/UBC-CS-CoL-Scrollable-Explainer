@@ -100,3 +100,12 @@
   stroke: #000;
   stroke-width: 4px;
 }
+
+#scatterSelectButton {
+  top: 1%;
+  left: 110%;
+  width: 100px;
+  height: 30px;
+  position: relative;
+  z-index: 2;
+}
