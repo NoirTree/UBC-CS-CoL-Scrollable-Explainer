@@ -191,6 +191,7 @@ var scrollVis = function () {
       });
       dataDict["phdFunding"] = fundingDataPreprocessor(dataDict["phdFunding"]);
       dataDict["colPrograms"] = colDataPreprocessor(dataDict["colPrograms"]);
+
       // setup vis components
       setupTitle();
       setupLineVis();
@@ -205,17 +206,49 @@ var scrollVis = function () {
   function setupTitle() {
     g.append("text")
       .attr("class", "title mainTitle")
-      .attr("x", width / 5)
+      .attr("x", width / 5 + 100)
       .attr("y", height / 5)
-      .text("UBC CS CoL")
+      .text("Grad student life:")
       .style("font-size", 50);
 
     g.append("text")
+      .attr("class", "title mainTitle")
+      .attr("x", width / 5 + 100)
+      .attr("y", height / 5 + 100)
+      .text(" Cost of Living @UBC")
+      .style("font-size", 50);
+
+    g.append("text")
+      .attr("class", "title mainTitle")
+      .attr("x", width / 5 + 100)
+      .attr("y", height / 5 + 150)
+      .text(
+        " I am more stressed now about my financial situation than during my undergrad when I had to take out loans. The cost of living in Vancouver is unmanageable."
+      )
+      .style("font-size", 10);
+
+    g.append("text")
+      .attr("class", "title mainTitle")
+      .attr("x", width / 5 + 100)
+      .attr("y", height / 5 + 200)
+      .text(
+        "The cost of living in Vancouver is unmanageable. - Quote from student"
+      )
+      .style("font-size", 10);
+
+    g.append("text")
       .attr("class", "title subTitle")
-      .attr("x", width / 3)
+      .attr("x", width / 3 + 17)
       .attr("y", height / 2 + height / 5)
       .text("Scroll down to learn more!")
       .style("font-size", 40);
+
+    g.append("text")
+      .attr("class", "title subTitle")
+      .attr("x", width / 3 + 17)
+      .attr("y", height / 2 + height / 5 + 10)
+      .text("<Insert photo of ubc>")
+      .style("font-size", 20);
 
     g.selectAll(".title").attr("opacity", 0);
 
@@ -225,7 +258,7 @@ var scrollVis = function () {
       .attr("points", "0 0, 30 45, 60 0")
       .attr("stroke", "grey")
       .attr("fill", "grey")
-      .attr("transform", `translate(50, ${height - 50})`)
+      .attr("transform", `translate(300, ${height - 100})`) //is there a way to center this? - Dev
       .attr("opacity", 0);
   }
 
@@ -371,13 +404,23 @@ var scrollVis = function () {
   var setupBarVis = function () {
     // perform some preprocessing on raw data
     var phdFundingdata = dataDict["phdFunding"];
-    // set the bar scale's domain
-    xBarScale.domain([
-      0,
+
+    var maxFigure = Math.max(
+      -d3.min(phdFundingdata, function (d) {
+        return d.Yearly_col_kCAD_neg;
+      }),
       d3.max(phdFundingdata, function (d) {
         return d.Yearly_funding_kCAD;
       })
-    ]);
+    );
+    // set the bar scale's domain
+    xBarScale.domain([-maxFigure, maxFigure]);
+    // xBarScale.domain([
+    //   0,
+    //   d3.max(phdFundingdata, function (d) {
+    //     return d.Yearly_funding_kCAD;
+    //   })
+    // ]);
     yBarScale.domain(
       phdFundingdata.map(function (d) {
         return d.University;
@@ -394,6 +437,25 @@ var scrollVis = function () {
       .style("font-size", 10)
       .text("kCAD")
       .attr("opacity", 0);
+
+    g.append("g")
+      .attr("class", "colAndFundingLabel")
+      .append("text")
+      .attr("x", xBarScale(0) + 5)
+      .attr("y", 20)
+      .attr("text-anchor", "start")
+      .style("fill", "black")
+      .style("font-size", 10)
+      .text("Funding");
+    g.select(".colAndFundingLabel")
+      .append("text")
+      .attr("x", xBarScale(0) - 5)
+      .attr("y", 20)
+      .attr("text-anchor", "end")
+      .style("fill", "black")
+      .style("font-size", 10)
+      .text("Cost of Living");
+    g.select(".colAndFundingLabel").attr("opacity", 0);
 
     // axis: leave for activate function
     // // call the axis and hide them
@@ -412,16 +474,18 @@ var scrollVis = function () {
       });
     bars = bars
       .merge(barsE)
-      .attr("x", 0)
+      .attr("x", xBarScale(0))
+      // .attr("x", 0)
       .attr("y", function (d) {
         return yBarScale(d.University);
       })
       .attr("width", 0) // first set to 0
-      .attr("fill", function (d) {
-        return d.University === "University of British Columbia"
-          ? "gold"
-          : barColors["Funding"];
-      })
+      // .attr("fill", function (d) {
+      //   return d.University === "University of British Columbia"
+      //     ? "gold"
+      //     : barColors["Funding"];
+      // })
+      .attr("fill", barColors["Funding"])
       .attr("height", yBarScale.bandwidth())
       .attr("opacity", barOpacity);
 
@@ -435,9 +499,13 @@ var scrollVis = function () {
       });
     reverseBars = reverseBars
       .merge(reverseBarsE)
+      // .attr("x", xBarScale(0))
       .attr("x", function (d) {
-        return xBarScale(d.Yearly_funding_kCAD);
+        return xBarScale(0);
       })
+      // .attr("x", function (d) {
+      //   return xBarScale(d.Yearly_funding_kCAD);
+      // })
       .attr("y", function (d) {
         return yBarScale(d.University);
       })
@@ -464,7 +532,7 @@ var scrollVis = function () {
       .attr("y", function (d) {
         return yBarScale(d.University);
       })
-      .attr("dy", yBarScale.bandwidth() / 1.2)
+      .attr("dy", yBarScale.bandwidth() / 1.4)
       .style("font-size", fontSize)
       .attr("fill", "black")
       .attr("opacity", 0);
@@ -774,8 +842,8 @@ var scrollVis = function () {
     activateFunctions[10] = afterSupportScatter;
     activateFunctions[11] = showSafeBalls;
     activateFunctions[12] = showLollipop;
-    activateFunctions[13] = showBar;
-    activateFunctions[14] = showReverseBar;
+    activateFunctions[13] = showDivergingBar;
+    activateFunctions[14] = showOverlappingBar;
     activateFunctions[15] = reOrderBar;
     activateFunctions[16] = closingTitle;
 
@@ -1523,6 +1591,10 @@ var scrollVis = function () {
       .transition()
       .duration(fadeOutDuration)
       .attr("opacity", 0);
+    g.select(".colAndFundingLabel")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
 
     // show now
     // todo: show lollipop
@@ -1541,12 +1613,8 @@ var scrollVis = function () {
    * shows now: barchart
    *
    */
-  function showBar() {
-    // ensure bar axis is set
-    showAxis(xAxisBar, "topAxis", null, null);
-
-    // hides previous:
-    // todo: hide lollipop
+  function showDivergingBar() {
+    // hides previous: hide lollipop
     d3.select("#observable-embed-lollipop")
       .transition()
       .duration(fadeOutDuration)
@@ -1554,15 +1622,32 @@ var scrollVis = function () {
     // .style("display", "none");
 
     // hides next:
-    g.selectAll(".colBar")
-      .transition()
-      .duration(fadeOutDuration)
-      .attr("x", function (d) {
-        return xBarScale(d.Yearly_funding_kCAD);
-      })
-      .attr("width", 0);
+    // g.selectAll(".colBar")
+    //   .transition()
+    //   .duration(fadeOutDuration)
+    //   .attr("x", function (d) {
+    //     return xBarScale(d.Yearly_funding_kCAD);
+    //   })
+    //   .attr("width", 0);
 
     // shows now
+    var maxFigure = Math.max(
+      -d3.min(dataDict["phdFunding"], function (d) {
+        return d.Yearly_col_kCAD_neg;
+      }),
+      d3.max(dataDict["phdFunding"], function (d) {
+        return d.Yearly_funding_kCAD;
+      })
+    );
+    // set the bar scale's domain
+    xBarScale.domain([-maxFigure, maxFigure]);
+
+    showAxis(xAxisBar, "topAxis", null, null);
+    g.select(".colAndFundingLabel")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 1);
+
     g.selectAll(".yBarLabel")
       .transition()
       .duration(fadeOutDuration)
@@ -1570,8 +1655,22 @@ var scrollVis = function () {
     g.selectAll(".fundingBar")
       .transition("showBar")
       .duration(fadeOutDuration)
+      .attr("x", function (d) {
+        return xBarScale(0);
+      })
       .attr("width", function (d) {
-        return xBarScale(d.Yearly_funding_kCAD);
+        return xBarScale(d.Yearly_funding_kCAD) - xBarScale(0);
+      });
+
+    g.selectAll(".colBar")
+      .transition("showBar")
+      .duration(fadeOutDuration)
+      .attr("x", function (d) {
+        return xBarScale(d.Yearly_col_kCAD_neg);
+      })
+      .attr("width", function (d) {
+        // console.log(d.University + `:${d.Yearly_col_kCAD_neg}`);
+        return xBarScale(0) - xBarScale(d.Yearly_col_kCAD_neg);
       });
 
     g.selectAll(".barText")
@@ -1588,7 +1687,13 @@ var scrollVis = function () {
    * shows now: barchart
    *
    */
-  function showReverseBar() {
+  function showOverlappingBar() {
+    // hide previous
+    g.select(".colAndFundingLabel")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
+
     // hide next: revert ordering
     yBarScale.domain(
       dataDict["phdFunding"].map(function (d) {
@@ -1596,11 +1701,25 @@ var scrollVis = function () {
       })
     );
     // showAxis(null, null, yAxisBar, "leftAxis");
+
+    // hide previous + shows now
+    xBarScale.domain([
+      0,
+      d3.max(dataDict["phdFunding"], function (d) {
+        return d.Yearly_funding_kCAD;
+      })
+    ]);
+    showAxis(xAxisBar, "topAxis", null, null); // need to redraw because it may come back from following sections
+
+    // after reseting x and y scales
     g.selectAll(".fundingBar")
       .transition("revertOrder")
       .duration(fadeOutDuration)
       .attr("width", function (d) {
         return xBarScale(d.Yearly_funding_kCAD);
+      })
+      .attr("x", function (d) {
+        return xBarScale(0);
       })
       .attr("y", function (d) {
         return yBarScale(d.University);
@@ -1614,18 +1733,16 @@ var scrollVis = function () {
     g.selectAll(".colBar")
       .transition("showBar")
       .duration(fadeOutDuration)
+      .attr("x", function (d) {
+        return xBarScale(d.Yearly_funding_kCAD - d.Yearly_col_kCAD);
+      })
       .attr("y", function (d) {
         return yBarScale(d.University);
       })
       .attr("width", function (d) {
         return xBarScale(d.Yearly_col_kCAD);
-      })
-      .attr("x", function (d) {
-        return xBarScale(d.Yearly_funding_kCAD - d.Yearly_col_kCAD);
       });
 
-    // shows now
-    // showAxis(xAxisBar, "topAxis", null, null); // need to redraw because it may come back from following sections
     // g.selectAll(".colBar")
     //   .transition()
     //   .duration(fadeOutDuration)
@@ -1889,7 +2006,14 @@ var scrollVis = function () {
    * @param rawData - data read in from file
    */
   function fundingDataPreprocessor(rawData) {
-    return rawData;
+    return rawData.map((d) => ({
+      University: d["University"],
+      Yearly_funding_kCAD: +d.Yearly_funding_kCAD,
+      Yearly_col_kCAD: +d.Yearly_col_kCAD,
+      Yearly_col_kCAD_neg: -d.Yearly_col_kCAD,
+      Funding_col_ratio: +d.Funding_col_ratio,
+      Yearly_left_kCAD: +d.Yearly_left_kCAD
+    }));
   }
 
   function colDataPreprocessor(rawData) {
