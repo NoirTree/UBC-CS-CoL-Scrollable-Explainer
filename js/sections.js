@@ -177,6 +177,17 @@ var scrollVis = function () {
         .attr("transform", "translate(0,0)");
 
       // preprocess data in the dataDict
+      dataDict["treeData"] = {
+        name: "basic expenses",
+        children: [
+          { name: "food", value: 350 },
+          { name: "social", value: 200 },
+          { name: "health", value: 115 },
+          { name: "utilities", value: 90 },
+          { name: "housing", value: 1400 },
+          { name: "commute", value: 90 }
+        ]
+      };
       dataDict["bcPCI"] = cpiDataPreprocessor(dataDict["bcPCI"]);
       dataDict["PCI22"] = cpi22DataPreprocessor(dataDict["PCI22"]);
       dataDict["PCI22Grouped"] = allGroup.map(function (gpName) {
@@ -270,17 +281,6 @@ var scrollVis = function () {
    *
    */
   var setupTreemap = function () {
-    dataDict["treeData"] = {
-      name: "basic expenses",
-      children: [
-        { name: "food", value: 350 },
-        { name: "social", value: 200 },
-        { name: "health", value: 115 },
-        { name: "utilities", value: 90 },
-        { name: "housing", value: 1400 },
-        { name: "commute", value: 90 }
-      ]
-    };
     var treedata = dataDict["treeData"];
 
     // Give the data to this cluster layout:
