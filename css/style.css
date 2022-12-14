@@ -178,6 +178,10 @@ section:last-of-type {
   justify-content: space-between;
 }
 
-.treemap_legend {
+/* .treemap_legend {
   z-index: 100;
+} */
+
+.treemap-total {
+  font-size: 2rem;
 }

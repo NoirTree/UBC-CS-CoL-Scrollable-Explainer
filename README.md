@@ -1,13 +1,20 @@
 ## D3 Scrollytelling Demo
 
-Example code of how you might make a basic scrollytelling site using [D3](https://d3js.org/).
+This scrollable explainer shows the current financial struggle of UBC CS graduate students.
 
-[Demo Here](http://vallandingham.me/scroll_demo/).
+This project is a fork of [vlandham's scroll_demo](https://github.com/vlandham/scroll_demo) and the visualizations are created with [D3](https://d3js.org/) V4.
 
-This code has been **updated to use D3v4**.
+### Structure
 
-If you are looking for the old D3v3 code, check out the [old-d3v3 branch](https://github.com/vlandham/scroll_demo/tree/old-d3v3) of this repository.
+- assets: external images.
+- css: stylesheets. Mainly refer to [vlandham's scroll_demo](https://github.com/vlandham/scroll_demo) but have been changed a lot.
+- data: datasets used in visualizations.
+- js: javascripts.
+  - scroller.js: handles the logic of scroller. We does not change anything from the [original version](https://github.com/vlandham/scroll_demo/blob/gh-pages/js/scroller.js).
+  - sections.js: bridges the scroller and the content. This is where the majority of our work sits and contains all the visualizations used in the explainer.
+- lib: d3v4 library.
+- index.html: main page where the content of the explainer sits.
 
-Originally, this code was part of a talk given at [OpenVis Conf](http://openvisconf.com/) about scrollytelling.
+### How to run
 
-[Check out the talk and additional materials!](http://vallandingham.me/think_you_can_scroll.html)
+To run it, you can open [this codesandbox](https://codesandbox.io/s/explainer-content-jvp3q5?file=/README.md) and directly see the result from the built-in browser.

@@ -31,14 +31,15 @@
         <section class="step">
           <h2 class="title">Welcome!</h2>
           <p>
-            Welcome! In May 2022, a survey created by UBC Computer Science (CS)
-            graduate students was sent out to CS graduate students in the
-            department to determine how well students were being supported by
-            their current stipends. This article uses the survey data to allow
-            you to learn about the current cost of living situation in Vancouver
-            (as of Dec 2022), see how students are being supported, and compare
-            your current budget to that of an average CS graduate student.
-            Scroll through the article for more information!
+            In May 2022, some UBC Computer Science (CS) graduate students
+            distributed surveys to the other students in the department to
+            determine how well students were being supported by their current
+            stipends. This explainer uses the survey data, and data from
+            government and university websites to demonstrate the current cost
+            of living situation in Vancouver (as of Dec 2022), see how students
+            are being supported, and compare your own budget to that of an
+            average CS graduate student. Scroll through the article for more
+            information!
           </p>
           <!-- This is a scrollable explainer that shows the struggle of current
             UBC CS graduate students.  -->
@@ -48,73 +49,81 @@
           <h2 class="title">
             So what expenses does a UBC CS grad student have?
           </h2>
-          Tommy, can they click on the tree map?
+          <p>
+            Focusing on the basic expenses of a CS graduate student, this shows
+            the average proportion of their expenses separated into housing,
+            food, social activities, health, utilies, and commuting
+            expenditures.
+          </p>
         </section>
 
         <section class="step">
           <h2 class="title">
-            CPI explain
+            How can we calculate inflation in Vancouver?
           </h2>
-          The meaning of CPI.
+          The consumer price index (CPI) is a common econcomic metric used to
+          measure the inflation rate in a certain economic market (such as
+          Vancouver). It is a proportional metric used to compare prices of an
+          item now to the price of the same item some years ago. For example, if
+          a banana cost $2 in 2022, but now costs $4 in 2022. The CPI for the
+          banana would be: 200. Note, there are not units for this metric.
         </section>
         <section class="step">
           <h2 class="title">Inflation Rate at British Columbia</h2>
           <p>
-            Can we add a section above this saying like: let's learn about the
-            cost of living in vancouver. CPI is a common indicator of inflation
-            rate. It is the ratio of (current price/price of the base period).
-          </p>
-          <p>
-            As you can see, it seldom goes down over the last 6 years. Recently
-            the index almost skyrockets -- not a good sign.
+            Here we have the overaall CPI for British Columbia since 2016. The
+            CPI calculated here is based on comparing prices of items to their
+            original price in 2002. The visualization here depicts the overal
+            upward trend of CPI indicating that inflation has been increasing
+            since 2002.
           </p>
         </section>
 
         <section class="step">
-          <h2 class="title">12-month % change</h2>
+          <h2 class="title">The 12-month % change</h2>
           <p>
-            A more informative indicator is the change of CPI compared to last
-            year.
-          </p>
-          <p>
-            The problem is much more clear -- The growth rate increases
-            dramatically in 2022!
+            An overall change of inflation over the course of 2 decades is not
+            surprising. But let's compare the CPI change from year to year. In
+            this visualization, we have how CPI has changed compared to the
+            previous year. If you look at 2022, this rate is strikingly fast
+            compared to previous years.
           </p>
         </section>
 
         <section class="step">
           <h2 class="title">Components</h2>
           <p>
-            We can calculate CPI for different components, such as food and
-            hosuing.
-          </p>
-          <p>
-            Let's only focus on the last 1 year (Oct-21 to Sept-22). Seems like
-            the only thing that is more affordable is clothing. But we don't buy
-            clothes everyday, right?
+            Let's look at the previous year a little most closely. In this graph
+            every line represents the change in CPI from October 2021 to
+            September 2022. We can calculate CPI for different components, such
+            as food and hosuing. Looks like in August of 2022, clothing was
+            overall less expensive than in August of 2021.
           </p>
         </section>
 
         <section class="step">
           <h2 class="title">Housing!</h2>
           <p>
-            Unfortunately, 🏠, the component that makes most of our basic
-            expenses, has one of the highest 12-month CPI over the last year.
-            8.26% means that if your rent is 1600$ last year, it will be
+            But housing has one of the highest 12-month CPI over the last year.
+            A CPI of 8.26% means that if your rent was 1600$ last year, it will
+            be
             <strong>1732$</strong>
-            this year.
+            this year. This is particularly concerning for graduate students
+            since housing is the largest monthly expense that students have.
           </p>
         </section>
 
         <section class="step">
           <h2 class="title">Food &amp; Transport</h2>
           <p>
-            The price of food also rises so much -- It means that if you buy a
-            <span>🥩</span> with 10$ last year, it will cost you 11$ this year!
+            The price of food and transport has also risen. This means that if
+            you bought a steak (<span>🥩</span>) for 10$ last year, it will cost
+            you 11$ this year!
           </p>
           <p>
-            🚗 has the highest 12-month CPI. Though it does not take up a huge
-            amount of our basic expense, it means that
+            Transport (🚗) has the the overall highest 12-month CPI. Transport
+            is a relatively smaller portion of the average CS students' monthly
+            budget. However, given these rapid increase
             <strong>you cannot choose to live too far away</strong> -- and rent
             is soaring!
           </p>
@@ -294,30 +303,5 @@
         return ["data_avg", "xScale", "yScale", "xAxis"].includes(name);
       });
     </script>
-
-    <!-- <script type="module">
-      import {
-        Runtime,
-        Inspector
-      } from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@5/dist/runtime.js";
-      import define from "https://api.observablehq.com/d/99c0287acd01a0e6@766.js?v=3";
-      new Runtime().module(define, (name) => {
-        if (name === "viewof food_health")
-          return new Inspector(
-            document.querySelector("#observablehq-viewof-food_health-82cc3737")
-          );
-        if (name === "viewof utilities_commute")
-          return new Inspector(
-            document.querySelector(
-              "#observablehq-viewof-utilities_commute-82cc3737"
-            )
-          );
-        if (name === "lollipopdm")
-          return new Inspector(
-            document.querySelector("#observablehq-lollipopdm-82cc3737")
-          );
-        return ["data_avg", "xScale", "yScale"].includes(name);
-      });
-    </script> -->
   </body>
 </html>

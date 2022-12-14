@@ -364,6 +364,17 @@ var scrollVis = function () {
       .attr("font-weight", "400")
       .attr("fill", "black");
 
+    treeg
+      .selectAll("treeText")
+      .data(root.leaves())
+      .enter()
+      .append("text")
+      .attr("class", "treeText treemap-total")
+      .text(`Total Basic Expenses: $2351.40`);
+
+    // .attr("x", width / 5 + 150)
+    // .attr("y", height)
+
     // treeg
     //   .selectAll(".treemapG")
     //   .append("image")
