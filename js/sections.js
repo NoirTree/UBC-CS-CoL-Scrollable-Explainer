@@ -10,7 +10,7 @@ var scrollVis = function () {
   var width = 600; // width of real graph
   var height = 450;
   var tm_height = 600;
-  var margin = { top: 20, left: 40, bottom: 40, right: 20 }; // margin between graph and <svg> it appends
+  var margin = { top: 20, left: 128, bottom: 40, right: 20 }; // margin between graph and <svg> it appends
   // var SectionNumbers = activateFunctions.length; // how many sections we have in total
   var fadeOutDuration = 500;
   var fontSize = 12;
@@ -31,13 +31,22 @@ var scrollVis = function () {
 
   // We will set up elements that are independent of data.
   // @v4 using new scale names
-
+  var xprompt = width / 2 - 80;
   /**
    * Linechart
    */
   var xLineCPIScale = d3.scaleTime().range([0, width]);
   var yLineCPIScale = d3.scaleLinear().range([height, 0]);
   var xAxisLine = d3.axisBottom().scale(xLineCPIScale);
+  var xAxisLineFormated = d3
+    .axisBottom(xLineCPIScale)
+    .tickFormat(function (date) {
+      if (d3.timeYear(date) < date) {
+        return d3.timeFormat("%b")(date);
+      } else {
+        return d3.timeFormat("%Y")(date);
+      }
+    });
   var yAxisLine = d3.axisLeft().scale(yLineCPIScale);
   var lineOpacity = 1.0;
   var lineCollections = {};
@@ -81,7 +90,11 @@ var scrollVis = function () {
   var yAxisBar = d3.axisLeft().scale(yBarScale);
   var barOpacity = 0.5;
   // Color is determined just by the index of the bars
-  var barColors = { Funding: "steelblue", col: "orangered" };
+  var barColors = d3
+    .scaleOrdinal()
+    .domain(["Funding", "col"])
+    .range(d3.schemeCategory10);
+  // var barColors = { Funding: "steelblue", col: "orangered" };
 
   /**
    * Scatterplot
@@ -102,7 +115,8 @@ var scrollVis = function () {
   var scatterColors = d3
     .scaleOrdinal()
     .domain(financial_status_lst)
-    .range(["green", "blue", "red"]);
+    // .range(d3.schemeCategory10);
+    .range(["green", "blue", "orangered"]);
   // shape scale: programs
   var scatterShape = d3.scaleOrdinal(d3.symbols);
   var scatterSymbol = d3.symbol();
@@ -181,12 +195,12 @@ var scrollVis = function () {
       dataDict["treeData"] = {
         name: "basic expenses",
         children: [
-          { name: "food", value: 350 },
-          { name: "social", value: 200 },
-          { name: "health", value: 115 },
-          { name: "utilities", value: 90 },
-          { name: "housing", value: 1400 },
-          { name: "commute", value: 90 }
+          { name: "food", value: 512.64 },
+          { name: "social", value: 193.84 },
+          { name: "health", value: 141.11 },
+          { name: "utilities", value: 128.08 },
+          { name: "housing", value: 1254.67 },
+          { name: "commute", value: 121.06 }
         ]
       };
       dataDict["bcPCI"] = cpiDataPreprocessor(dataDict["bcPCI"]);
@@ -213,6 +227,7 @@ var scrollVis = function () {
       setupBarVis(); // can add more data as multiple parameters. See the original design
       // console.log(dataDict);
       setupSafeBalls();
+      // setupMisc();
       setupSections();
     });
   };
@@ -220,49 +235,48 @@ var scrollVis = function () {
   function setupTitle() {
     g.append("text")
       .attr("class", "title mainTitle")
-      .attr("x", width / 5 + 100)
+      .attr("x", width / 5 + 150)
       .attr("y", height / 5)
-      .text("Grad student life:")
-      .style("font-size", 50);
+      .text("Grad student life:");
 
     g.append("text")
       .attr("class", "title mainTitle")
-      .attr("x", width / 5 + 100)
-      .attr("y", height / 5 + 100)
+      .attr("x", width / 5 + 150)
+      .attr("y", height / 5 + 64)
       .text(" Cost of Living @UBC")
       .style("font-size", 50);
 
     g.append("text")
-      .attr("class", "title mainTitle")
-      .attr("x", width / 5 + 100)
-      .attr("y", height / 5 + 150)
+      .attr("class", "title quote")
+      .attr("x", width / 5 + 150)
+      .attr("y", height / 5 + 100)
       .text(
-        " I am more stressed now about my financial situation than during my undergrad when I had to take out loans. The cost of living in Vancouver is unmanageable."
-      )
-      .style("font-size", 10);
+        `"I am more stressed now about my financial situation than during my 
+        undergrad when I had to take out loans."`
+      );
 
     g.append("text")
-      .attr("class", "title mainTitle")
+      .attr("class", "title quote")
       .attr("x", width / 5 + 100)
-      .attr("y", height / 5 + 200)
+      .attr("y", height / 5 + 116)
       .text(
-        "The cost of living in Vancouver is unmanageable. - Quote from student"
-      )
-      .style("font-size", 10);
+        `"The cost of living in Vancouver is unmanageable." - Quote from student`
+      );
 
-    g.append("text")
-      .attr("class", "title subTitle")
-      .attr("x", width / 3 + 17)
-      .attr("y", height / 2 + height / 5)
-      .text("Scroll down to learn more!")
-      .style("font-size", 40);
+    // g.append("text")
+    //   .attr("class", "title subTitle")
+    //   .attr("x", width / 3 + 67)
+    //   .attr("y", height / 2 + 32)
+    //   .text("Scroll down to learn more!")
+    //   .style("font-size", 40);
 
-    g.append("text")
-      .attr("class", "title subTitle")
-      .attr("x", width / 3 + 17)
-      .attr("y", height / 2 + height / 5 + 10)
-      .text("<Insert photo of ubc>")
-      .style("font-size", 20);
+    g.append("svg:image")
+      .attr("class", "title ")
+      .attr("x", width / 6 - 110)
+      .attr("y", height - 230)
+      // .attr("width", 20)
+      .attr("height", 180)
+      .attr("xlink:href", "../assets/vancouver.png");
 
     g.selectAll(".title").attr("opacity", 0);
 
@@ -272,7 +286,7 @@ var scrollVis = function () {
       .attr("points", "0 0, 30 45, 60 0")
       .attr("stroke", "grey")
       .attr("fill", "grey")
-      .attr("transform", `translate(50, ${height - 100})`) //is there a way to center this? - Dev
+      .attr("transform", `translate(${xprompt}, ${height - 100})`) //is there a way to center this? - Dev
       .attr("opacity", 0);
   }
 
@@ -297,6 +311,11 @@ var scrollVis = function () {
     d3.treemap().size([height, height]).padding(2)(root);
 
     // use this information to add rectangles:
+
+    var treeColors = d3
+      .scaleLinear()
+      .domain([120, 1260])
+      .range(["white", "steelblue"]);
     treeg
       .selectAll("treeRect")
       .data(root.leaves())
@@ -316,7 +335,14 @@ var scrollVis = function () {
         return d.y1 - d.y0;
       })
       .style("stroke", "black")
-      .style("fill", "steelblue");
+      .style("fill", function (d) {
+        return treeColors(d.data.value);
+      });
+    // .style("fill", function (d) {
+    //   // console.log((d.data.value / 2351.4) * 100);
+    //   // Saturation % based on budget proportion
+    //   return `hsl(212, ${(d.data.value / 2351.4) * 100}%, 32%)`;
+    // });
 
     // and to add the text labels
     treeg
@@ -327,16 +353,33 @@ var scrollVis = function () {
       .attr("class", "treeText")
       .attr("x", function (d) {
         return d.x0 + 5;
-      }) // +10 to adjust position (more right)
+      }) // +5 to adjust position (more right)
       .attr("y", function (d) {
         return d.y0 + 20;
       }) // +20 to adjust position (lower)
       .text(function (d) {
-        return d.data.name;
+        return `${d.data.name}: $${d.data.value}`;
       })
-      .attr("font-size", "15px")
+      .attr("font-size", "1.2rem")
+      .attr("font-weight", "400")
       .attr("fill", "black");
 
+    // treeg
+    //   .selectAll(".treemapG")
+    //   .append("image")
+    //   .attr("class", "treemap_legend")
+    //   .attr("href", "../assets/tm_colourlegend.svg");
+
+    // // add legend for the treemap
+    // treeg
+    //   .append("g")
+    //   .attr("class", "treeLegend")
+    //   .attr("transform", `translate(${100 + height}, 0)`)
+    //   .attr("width", width)
+    //   .attr("height", height)
+    //   .style("fill", "url(#linear-gradient)");
+
+    // hide everything
     treeg.selectAll(".treeRect, .treeText").attr("opacity", 0);
   };
 
@@ -347,6 +390,15 @@ var scrollVis = function () {
    */
   var setupLineVis = function () {
     var bcPCIdata = dataDict["bcPCI"];
+
+    // append equation
+    var CPIEquationg = g.append("g").attr("class", "CPIexplain");
+    CPIEquationg.append("image")
+      .attr("id", "CPIequation")
+      .attr("href", "/assets/CPIequation.svg")
+      .attr("height", height)
+      .attr("width", width);
+    CPIEquationg.attr("opacity", 0);
 
     // set the line scale's domain
     xLineCPIScale.domain(
@@ -563,7 +615,7 @@ var scrollVis = function () {
       //     ? "gold"
       //     : barColors["Funding"];
       // })
-      .attr("fill", barColors["Funding"])
+      .attr("fill", barColors("Funding"))
       .attr("height", yBarScale.bandwidth())
       .attr("opacity", barOpacity);
 
@@ -588,7 +640,7 @@ var scrollVis = function () {
         return yBarScale(d.University);
       })
       .attr("width", 0) // first set to 0
-      .attr("fill", barColors["col"])
+      .attr("fill", barColors("col"))
       // .attr("fill", function (d) {
       //   return d.University === "University of British Columbia"
       //     ? "red"
@@ -886,7 +938,7 @@ var scrollVis = function () {
       .attr("cx", safeBallPos.unsafecx)
       .attr("cy", safeBallPos.unsafecy)
       .attr("r", 0)
-      .attr("fill", "red")
+      .attr("fill", "orangered")
       .attr("opacity", 0.7);
 
     g.selectAll(".safeBalls")
@@ -914,7 +966,7 @@ var scrollVis = function () {
       .attr("x", safeBallPos.unsafecx)
       .attr("y", safeBallPos.unsafecy + 25)
       .attr("fill", "white")
-      .style("font-size", 15)
+      .style("font-size", 20)
       .attr("text-anchor", "middle")
       .text("feel unsafe");
     g.selectAll(".safeBalls.captions")
@@ -925,8 +977,47 @@ var scrollVis = function () {
       .style("font-size", 15)
       .attr("text-anchor", "middle")
       .text("in current stipend amount");
-
+    g.selectAll(".safeBalls.captions")
+      .append("text")
+      .attr("x", safeBallPos.safecx)
+      .attr("y", safeBallPos.safecy)
+      .attr("fill", "white")
+      .style("font-size", 20)
+      .attr("text-anchor", "middle")
+      .text(`${((safeNum * 100) / (unsafeNum + safeNum)).toFixed(1)}%`);
+    g.selectAll(".safeBalls.captions")
+      .append("text")
+      .attr("x", safeBallPos.safecx)
+      .attr("y", safeBallPos.safecy + 25)
+      .attr("fill", "white")
+      .style("font-size", 15)
+      .attr("text-anchor", "middle")
+      .text("feel safe");
     g.selectAll(".safeBalls.captions").attr("opacity", 0);
+  };
+
+  /**
+   * setupSafeBalls - setup others, like image.
+   *
+   */
+  var setupMisc = function () {
+    d3.select("#vis")
+      .append("a")
+      .attr("id", "unionLogo")
+      .attr("href", "https://organizeubc.cupe.ca/sign-a-card/")
+      .attr("target", "_blank")
+      .append("svg")
+      .attr("height", height)
+      .attr("width", width)
+      .append("image")
+      .attr(
+        "href",
+        "https://organizeubc.cupe.ca/wp-content/uploads/sites/212/2022/10/UBC-Logo_Final.png"
+      )
+      .attr("height", height)
+      .attr("width", width);
+    d3.select("#unionLogo svg image").attr("opacity", 0);
+    d3.select("#unionLogo").style("display", "none");
   };
   /**
    * setupSections - each section is activated
@@ -940,21 +1031,21 @@ var scrollVis = function () {
     // time the active section changes
     activateFunctions[0] = showTitle;
     activateFunctions[1] = showTreeMap;
-    // activateFunctions[2] = zoomTreeMap;
-    activateFunctions[2] = showCPILine;
-    activateFunctions[3] = show12MonthCPILine;
-    activateFunctions[4] = showMultiLines;
-    activateFunctions[5] = highLightHouseLines;
-    activateFunctions[6] = highLightFoodTransLines;
-    activateFunctions[7] = showScatter;
-    activateFunctions[8] = highLightScatter;
-    activateFunctions[9] = afterSupportScatter;
-    activateFunctions[10] = showSafeBalls;
-    activateFunctions[11] = showLollipop;
-    activateFunctions[12] = showDivergingBar;
-    activateFunctions[13] = showOverlappingBar;
-    activateFunctions[14] = reOrderBar;
-    activateFunctions[15] = closingTitle;
+    activateFunctions[2] = explainCPI;
+    activateFunctions[3] = showCPILine;
+    activateFunctions[4] = show12MonthCPILine;
+    activateFunctions[5] = showMultiLines;
+    activateFunctions[6] = highLightHouseLines;
+    activateFunctions[7] = highLightFoodTransLines;
+    activateFunctions[8] = showScatter;
+    activateFunctions[9] = highLightScatter;
+    activateFunctions[10] = afterSupportScatter;
+    activateFunctions[11] = showSafeBalls;
+    activateFunctions[12] = showLollipop;
+    activateFunctions[13] = showDivergingBar;
+    activateFunctions[14] = showOverlappingBar;
+    activateFunctions[15] = reOrderBar;
+    activateFunctions[16] = closingTitle;
 
     // updateFunctions are called while
     // in a particular section to update
@@ -965,7 +1056,7 @@ var scrollVis = function () {
     for (var i = 0; i < activateFunctions.length; i++) {
       updateFunctions[i] = function () {};
     }
-    updateFunctions[10] = updateSafeBalls;
+    updateFunctions[11] = updateSafeBalls;
   };
 
   /**
@@ -1023,10 +1114,10 @@ var scrollVis = function () {
       prompt
         .transition()
         .duration(fadeOutDuration)
-        .attr("transform", `translate(50, ${height - 50 + 30})`)
+        .attr("transform", `translate(${xprompt}, ${height - 50 + 30})`)
         .transition()
         .duration(fadeOutDuration)
-        .attr("transform", `translate(50, ${height - 50})`)
+        .attr("transform", `translate(${xprompt}, ${height - 50})`)
         .on("end", propmtMovement);
     }
   }
@@ -1047,15 +1138,10 @@ var scrollVis = function () {
       .attr("opacity", 0);
 
     // hide next
-    hideAxis("bottomAxis", "leftAxis");
-    g.selectAll(".CPILegend .MainLegend, .CPILegend .SubLegend")
+    d3.select(".CPIexplain")
       .transition()
       .duration(fadeOutDuration)
       .attr("opacity", 0);
-    g.selectAll(".CPILine")
-      .transition()
-      .duration(fadeOutDuration)
-      .attr("stroke-dasharray", `0,${lineLengthCollections["allItems"]}`);
 
     // show now
     // todo: show treemap
@@ -1066,7 +1152,7 @@ var scrollVis = function () {
   }
 
   /**
-   * showTreeMap - Treemap
+   * zoomTreeMap - Treemap
    *
    * hides previous: Title
    * hides next: linechart
@@ -1079,18 +1165,41 @@ var scrollVis = function () {
     // hide next
   }
 
+  function explainCPI() {
+    // hide previous
+    g.selectAll(".treeRect, .treeText")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
+
+    // hide next
+    hideAxis("bottomAxis", "leftAxis");
+    g.selectAll(".CPILegend .MainLegend, .CPILegend .SubLegend")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 0);
+    g.selectAll(".CPILine")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("stroke-dasharray", `0,${lineLengthCollections["allItems"]}`);
+
+    // show now
+    d3.select(".CPIexplain")
+      .transition()
+      .duration(fadeOutDuration)
+      .attr("opacity", 1);
+  }
   /**
    * showCPILine - linechart
    *
-   * hides previous: treemap
+   * hides previous: CPIexplain
    * hides next: legend
    * shows now: linechart
    *
    */
   function showCPILine() {
     // hide previous
-    // todo: hide treemap
-    g.selectAll(".treeRect, .treeText")
+    d3.select(".CPIexplain")
       .transition()
       .duration(fadeOutDuration)
       .attr("opacity", 0);
@@ -1252,7 +1361,7 @@ var scrollVis = function () {
 
     yLineCPIScale.domain([-0.05, 0.17]);
 
-    showAxis(xAxisLine, "bottomAxis", yAxisLine, "leftAxis"); // update
+    showAxis(xAxisLineFormated, "bottomAxis", yAxisLine, "leftAxis"); // update
 
     // redraw line
     var LineAllItems22CPI = d3
@@ -1393,6 +1502,7 @@ var scrollVis = function () {
       .attr("opacity", 0.2);
 
     // shows now
+    showAxis(xAxisLineFormated, "bottomAxis", yAxisLine, "leftAxis"); // update
     subCPIHighlight("FoodMonthCPI", "food", foodLastCPI);
     subCPIHighlight("TransportationMonthCPI", "transport", transLastCPI);
   }
@@ -1746,7 +1856,10 @@ var scrollVis = function () {
     d3.select("#observable-embed-lollipop")
       .transition()
       .duration(fadeOutDuration)
-      .style("opacity", 0);
+      .style("opacity", 0)
+      .transition()
+      .duration(0)
+      .style("display", "none");
 
     // show new: reserve for progress function
     // g.selectAll(".unsafeBall")
@@ -1818,6 +1931,14 @@ var scrollVis = function () {
       .transition()
       .duration(fadeOutDuration)
       .style("opacity", 1);
+
+    d3.select("#observable-embed-lollipop")
+      .transition()
+      .duration(0)
+      .style("display", "initial")
+      .transition()
+      .duration(fadeOutDuration)
+      .style("opacity", 1);
     // .style("display", "block");
   }
 
@@ -1834,7 +1955,10 @@ var scrollVis = function () {
     d3.select("#observable-embed-lollipop")
       .transition()
       .duration(fadeOutDuration)
-      .style("opacity", 0);
+      .style("opacity", 0)
+      .transition()
+      .duration(0)
+      .style("display", "none");
     // .style("display", "none");
 
     // hides next:
@@ -1983,6 +2107,20 @@ var scrollVis = function () {
    */
   function reOrderBar() {
     // hide next -- redraw
+    d3.select("#vis")
+      .transition()
+      .duration(0)
+      .style("display", "initial")
+      .transition()
+      .duration(fadeOutDuration)
+      .style("opacity", 1);
+
+    // d3.select("#unionLogo svg image")
+    //   .transition()
+    //   .duration(fadeOutDuration)
+    //   .attr("opacity", 0);
+    // d3.select("#unionLogo").style("display", "none");
+
     g.selectAll(".yBarLabel")
       .transition()
       .duration(fadeOutDuration)
@@ -2064,6 +2202,21 @@ var scrollVis = function () {
       .transition()
       .duration(fadeOutDuration)
       .attr("opacity", 0);
+
+    d3.select("#vis")
+      .transition()
+      .duration(fadeOutDuration)
+      .style("opacity", 0)
+      .transition()
+      .duration(0)
+      .style("display", "none");
+
+    // // show now
+    // d3.select("#unionLogo").style("display", "initial");
+    // d3.select("#unionLogo svg image")
+    //   .transition()
+    //   .duration(fadeOutDuration)
+    //   .attr("opacity", 1);
   }
 
   /**
@@ -2197,12 +2350,12 @@ var scrollVis = function () {
         .transition()
         .delay(delay + duration + duration * 2 * i)
         .duration(duration)
-        .attr("fill", barColors["col"]);
+        .attr("fill", barColors("col"));
       g.select(".highlightBar.fundingBar")
         .transition()
         .delay(delay + duration + duration * 2 * i)
         .duration(duration)
-        .attr("fill", barColors["Funding"]);
+        .attr("fill", barColors("Funding"));
     }
   }
 
@@ -2420,5 +2573,3 @@ d3.queue()
   .defer(d3.csv, "/data/phdFunding.csv")
   .defer(d3.csv, "/data/CoL_programs.csv")
   .await(display);
-
-// "/data/CoL_programs.csv"
